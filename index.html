@@ -1,0 +1,2967 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LIFE.OS // PHANTOM EDITION (P5R)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Russo One, Oswald, Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&family=Oswald:wght@600;700&family=Russo+One&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Russo One', 'Oswald', 'sans-serif'],
+                        condensed: ['Oswald', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        p5: {
+                            black: '#060606',
+                            dark: '#111111',
+                            card: '#141414',
+                            red: '#E60012',
+                            crimson: '#B8000E',
+                            yellow: '#FFD60A',
+                            white: '#FFFFFF',
+                            gray: '#262626'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #060606;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            padding-bottom: 108px;
+            min-height: 100vh;
+            /* Persona 5 Halftone + Red/Black Diagonal Rebellion Stripes */
+            background-image:
+                radial-gradient(rgba(230, 0, 18, 0.16) 1.5px, transparent 1.5px),
+                repeating-linear-gradient(
+                    -45deg,
+                    #060606,
+                    #060606 18px,
+                    #0d0204 18px,
+                    #0d0204 36px
+                );
+            background-size: 16px 16px, 100% 100%;
+        }
+
+        /* Persona 5 Skewed Containers & Cutout Aesthetics */
+        .p5-skew {
+            transform: skew(-5deg, -0.6deg);
+        }
+        .p5-unskew {
+            transform: skew(5deg, 0.6deg);
+        }
+        .p5-skew-hard {
+            transform: skew(-9deg, -1.2deg);
+        }
+        .p5-card {
+            background-color: #111111;
+            border: 2.5px solid #FFFFFF;
+            box-shadow: 5px 5px 0px #E60012;
+            transform: skew(-3deg, 0deg);
+            transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+        }
+        .p5-card-inner {
+            transform: skew(3deg, 0deg);
+        }
+        .p5-card-yellow {
+            background-color: #121212;
+            border: 2.5px solid #FFD60A;
+            box-shadow: 5px 5px 0px #E60012;
+            transform: skew(-3deg, 0deg);
+        }
+        .p5-card-red {
+            background-color: #E60012;
+            border: 2.5px solid #FFFFFF;
+            box-shadow: 5px 5px 0px #000000;
+            transform: skew(-3deg, 0deg);
+        }
+        .p5-cutout-btn {
+            border: 2px solid #FFFFFF;
+            box-shadow: 3px 3px 0px #E60012;
+            transform: skew(-6deg, 0deg);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s ease, background-color 0.12s ease;
+        }
+        .p5-cutout-btn:active {
+            transform: skew(-6deg, 0deg) translate(2px, 2px) scale(0.97);
+            box-shadow: 1px 1px 0px #E60012;
+        }
+        .p5-yellow-badge {
+            background-color: #FFD60A;
+            color: #060606;
+            border: 2px solid #000000;
+            box-shadow: 3px 3px 0px #E60012;
+            transform: skew(-8deg, -1deg);
+        }
+        .p5-red-slash {
+            background: linear-gradient(135deg, #E60012 0%, #B8000E 100%);
+            clip-path: polygon(0 0, 100% 4%, 98% 100%, 2% 96%);
+        }
+        .p5-blade-bar {
+            clip-path: polygon(0 0, 100% 0, 96% 100%, 0% 100%);
+        }
+
+        /* Hide scrollbar for horizontal pill bars */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #060606;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E60012;
+        }
+
+        @keyframes p5Pop {
+            0% { opacity: 0; transform: skew(-4deg, -1deg) scale(0.92); }
+            100% { opacity: 1; transform: skew(-3deg, 0deg) scale(1); }
+        }
+        .animate-p5-pop {
+            animation: p5Pop 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+    </style>
+</head>
+<body class="select-none">
+
+    <!-- ==================== PERSONA 5 ROYAL TOP HUD HEADER ==================== -->
+    <header class="sticky top-0 z-30 bg-[#060606]/95 backdrop-blur-md border-b-4 border-p5-red px-3 pt-2.5 pb-2.5 shadow-[0_6px_0_rgba(230,0,18,0.35)]">
+        <div class="max-w-md mx-auto">
+            <!-- Top Row: P5 Giant Date Widget + Level/Rank + PTS & Streak -->
+            <div class="flex items-center justify-between gap-2">
+                <!-- Left: Persona 5 Calendar Date & Weather/Time Cutout -->
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="bg-white text-black border-2 border-black px-2 py-1 p5-skew-hard shadow-[4px_4px_0_#E60012] shrink-0">
+                        <div class="flex items-baseline gap-0.5 leading-none">
+                            <span id="hud-date-month" class="font-display text-lg font-black tracking-tighter">11</span>
+                            <span class="font-display text-sm text-p5-red font-black">/</span>
+                            <span id="hud-date-day" class="font-display text-xl font-black tracking-tighter">10</span>
+                        </div>
+                        <div id="hud-date-dow" class="bg-p5-red text-white font-display text-[9px] px-1 uppercase tracking-widest text-center mt-0.5">
+                            TUE
+                        </div>
+                    </div>
+
+                    <!-- Level & Phantom Rank -->
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1">
+                            <span class="bg-p5-red text-white font-display text-[9px] uppercase tracking-wider px-1.5 py-0.5 border border-white p5-skew">
+                                TAKE YOUR TIME
+                            </span>
+                            <button id="sound-toggle-btn" onclick="toggleSound()" class="text-white/70 hover:text-p5-yellow text-xs px-1" title="Звук интерфейса">
+                                <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-baseline gap-1.5 mt-0.5">
+                            <span class="font-display text-xs text-p5-yellow uppercase">LV.<span id="hud-level" class="text-base text-white ml-0.5">1</span></span>
+                            <h1 id="hud-rank" class="font-display text-xs text-white uppercase tracking-wide truncate">Фантом-Новичок</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Shield, Streak & PTS Cutout -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <!-- Streak Freeze Shield Indicator -->
+                    <div id="hud-shield" class="hidden items-center gap-1 px-1.5 py-1 bg-white text-black border-2 border-p5-red text-[10px] font-display p5-skew" title="Активен щит заморозки стрика">
+                        <i class="fa-solid fa-shield-halved text-p5-red"></i>
+                        <span>ЩИТ</span>
+                    </div>
+
+                    <!-- Streak Pill -->
+                    <div class="flex items-center gap-1 px-2 py-1 bg-p5-dark border-2 border-white p5-skew shadow-[3px_3px_0_#E60012]" title="Дней в стрике (минимум 3 дейлика в день)">
+                        <i class="fa-solid fa-fire-flame-curved text-p5-red text-xs"></i>
+                        <span id="hud-streak" class="font-mono font-extrabold text-xs text-white">0</span>
+                    </div>
+
+                    <!-- PTS Rebellion Yellow Cutout -->
+                    <button onclick="switchMainTab('shop')" class="p5-yellow-badge px-2.5 py-1 flex items-center gap-1 active:translate-y-0.5">
+                        <i class="fa-solid fa-star text-p5-red text-xs"></i>
+                        <span id="hud-pts" class="font-mono font-black text-sm text-black">0</span>
+                        <span class="text-[9px] font-display uppercase text-black">PTS</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Slanted Blade XP Bar & Energy Can Price Pill -->
+            <div class="mt-2">
+                <div class="flex justify-between items-center text-[10px] font-mono mb-1">
+                    <span class="text-white/80 uppercase font-display tracking-wider">
+                        NEXT LV: <strong id="hud-xp-current" class="text-p5-yellow">0</strong>/<span id="hud-xp-next">200</span> XP
+                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="openEditCanPriceModal()" class="px-1.5 py-0.5 bg-black text-p5-yellow border border-p5-yellow font-mono text-[10px] font-bold p5-skew hover:bg-p5-yellow hover:text-black transition-colors">
+                            ⚡ Банка: <span id="hud-can-price">95</span>₽ ✎
+                        </button>
+                        <span id="hud-daily-quota" class="bg-p5-red text-white px-1.5 py-0.5 font-display text-[9px] uppercase p5-skew">
+                            КВОТА: 0/3
+                        </span>
+                    </div>
+                </div>
+                <div class="w-full h-2.5 bg-black border-2 border-white p5-skew overflow-hidden">
+                    <div id="hud-xp-bar" class="h-full bg-gradient-to-r from-p5-red via-p5-red to-p5-yellow p5-blade-bar transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== NEW DAY BANNER (AUTO-DETECT) ==================== -->
+    <div id="new-day-banner" class="hidden max-w-md mx-auto px-3.5 mt-3">
+        <div class="p5-card-red p-3 flex items-center justify-between gap-3">
+            <div class="p5-card-inner flex items-center gap-2.5">
+                <div class="w-8 h-8 bg-black text-p5-yellow border-2 border-white flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <div>
+                    <div class="text-xs font-display uppercase text-white tracking-wider">НАСТУПИЛ НОВЫЙ ДЕНЬ!</div>
+                    <div class="text-[11px] text-white/90 font-medium">Сбросить дейлики и зафиксировать стрик?</div>
+                </div>
+            </div>
+            <button onclick="openEndDayModal()" class="p5-cutout-btn bg-p5-yellow text-black font-display uppercase px-3 py-1.5 text-xs shrink-0">
+                НОВЫЙ ДЕНЬ
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+    <main class="max-w-md mx-auto px-3.5 pt-3.5">
+
+        <!-- ================= TAB 1: MISSIONS (МИССИИ / КВЕСТЫ) ================= -->
+        <section id="tab-quests" class="space-y-3.5">
+
+            <!-- Tactical Schedule Banner (Day of Week Confidant Alert) -->
+            <div id="schedule-banner" class="p5-card p-3">
+                <div class="p5-card-inner flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-p5-red text-white border-2 border-white flex items-center justify-center shrink-0 shadow-[2px_2px_0_#FFD60A]">
+                            <i class="fa-solid fa-mask text-sm"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <span id="sched-day-name" class="text-[10px] font-display uppercase tracking-wider px-1.5 py-0.5 bg-p5-yellow text-black font-black">ПОНЕДЕЛЬНИК</span>
+                                <span class="text-[10px] font-display uppercase text-p5-red tracking-wider">AFTER SCHOOL</span>
+                            </div>
+                            <div id="sched-anchors" class="text-xs font-bold text-white mt-0.5 truncate">
+                                Школа 08:00–13:30 (дома в 14:00)
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="openEndDayModal()" class="p5-cutout-btn bg-p5-red text-white px-2.5 py-1.5 text-[10px] font-display uppercase shrink-0">
+                        <i class="fa-solid fa-moon mr-1"></i>ИТОГ ДНЯ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sub-navigation for Quests: Daily / Weekly / Bosses -->
+            <div class="flex items-center justify-between gap-2">
+                <div class="grid grid-cols-3 gap-1.5 flex-1">
+                    <button onclick="switchQuestSubTab('daily')" id="qtab-daily" class="p5-cutout-btn py-1.5 px-2 text-xs font-display uppercase bg-p5-red text-white">
+                        ДЕЙЛИКИ (32)
+                    </button>
+                    <button onclick="switchQuestSubTab('weekly')" id="qtab-weekly" class="p5-cutout-btn py-1.5 px-2 text-xs font-display uppercase bg-p5-dark text-white/70">
+                        ВИКЛИКИ (7)
+                    </button>
+                    <button onclick="switchQuestSubTab('story')" id="qtab-story" class="p5-cutout-btn py-1.5 px-2 text-xs font-display uppercase bg-p5-dark text-white/70">
+                        ДВОРЦЫ (6)
+                    </button>
+                </div>
+
+                <!-- Add Custom Quest Button -->
+                <button onclick="openAddQuestModal()" class="p5-cutout-btn px-2.5 h-9 bg-p5-yellow text-black flex items-center justify-center gap-1 text-xs font-display uppercase shrink-0" title="Добавить свой квест">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>СВОЙ</span>
+                </button>
+            </div>
+
+            <!-- SPECIAL DAILIES WIDGETS: 1. DAILY PHOTO CONTRACT & 2. STEP TRACKER -->
+            <div id="daily-special-widgets" class="space-y-3">
+
+                <!-- WIDGET 1: ЕЖЕДНЕВНЫЙ ФОТО-КОНТРАКТ (Daily Photo Hunt) -->
+                <div class="p5-card-yellow p-3.5 relative overflow-hidden">
+                    <div class="p5-card-inner space-y-2.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-p5-red text-white font-display text-[10px] uppercase px-2 py-0.5 border border-white">
+                                    📸 КАДР ДНЯ // ФОТО-ОХОТА
+                                </span>
+                                <span class="text-[10px] font-mono text-p5-yellow">Nikon D5100 / S21 FE</span>
+                            </div>
+                            <button onclick="rerollPhotoPrompt()" class="p5-cutout-btn bg-black text-white px-2 py-1 text-[10px] font-display uppercase hover:bg-p5-red" title="Сменить тему кадра">
+                                🎲 Сменить
+                            </button>
+                        </div>
+
+                        <div class="p-2.5 bg-black border-l-4 border-p5-red">
+                            <div class="text-[10px] font-mono uppercase text-white/60">СЕГОДНЯШНЯЯ ЦЕЛЬ ОБЪЕКТИВА:</div>
+                            <div id="photo-prompt-title" class="text-sm font-extrabold text-white mt-0.5 leading-snug">
+                                Контрастный силуэт на фоне заката или яркого окна
+                            </div>
+                            <div id="photo-prompt-tip" class="text-[11px] text-p5-yellow font-mono mt-1">
+                                Совет: экспозиция по светлому участку, ISO 100–200
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <input id="photo-note-input" type="text" placeholder="Заметка: на что снял / ракурс (по желанию)" class="flex-1 px-2.5 py-1.5 bg-black border-2 border-white/40 text-xs text-white font-mono focus:outline-none focus:border-p5-yellow">
+                            <button id="photo-complete-btn" onclick="completeDailyPhotoContract()" class="p5-cutout-btn bg-p5-red text-white px-3 py-1.5 text-xs font-display uppercase shrink-0">
+                                📸 Снял! (+25)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WIDGET 2: ТРЕКЕР ШАГОВ (Step Counter with Auto-Quest Completion) -->
+                <div class="p5-card p-3.5">
+                    <div class="p5-card-inner space-y-2.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-white text-black font-display text-[10px] uppercase px-2 py-0.5 font-black">
+                                    👟 МАРШРУТ ФАНТОМА // ШАГИ
+                                </span>
+                            </div>
+                            <div class="font-mono text-xs font-black">
+                                <span id="steps-current" class="text-p5-yellow text-sm">0</span>
+                                <span class="text-white/60">/ 10 000 ШАГОВ</span>
+                            </div>
+                        </div>
+
+                        <!-- Slanted Step Progress Bar with 6k & 10k Checkpoints -->
+                        <div class="relative w-full h-3 bg-black border-2 border-white overflow-hidden">
+                            <div id="steps-progress-bar" class="h-full bg-gradient-to-r from-p5-red to-p5-yellow transition-all duration-300" style="width: 0%"></div>
+                            <!-- 60% marker line for 6,000 steps -->
+                            <div class="absolute top-0 bottom-0 left-[60%] w-0.5 bg-white/80" title="Рубеж 6 000 шагов (+20 PTS)"></div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[10px] font-mono text-white/70">
+                            <span id="steps-badge-6k"><i class="fa-regular fa-circle mr-1"></i>6 000 (+20 PTS)</span>
+                            <span id="steps-badge-10k"><i class="fa-regular fa-circle mr-1"></i>10 000 (+35 PTS)</span>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-1.5 pt-0.5">
+                            <button onclick="addSteps(1000)" class="p5-cutout-btn bg-p5-dark hover:bg-p5-red text-white py-1.5 text-[11px] font-mono font-bold">
+                                +1 000
+                            </button>
+                            <button onclick="addSteps(2500)" class="p5-cutout-btn bg-p5-dark hover:bg-p5-red text-white py-1.5 text-[11px] font-mono font-bold">
+                                +2 500
+                            </button>
+                            <button onclick="openManualStepsModal()" class="p5-cutout-btn bg-white text-black py-1.5 text-[10px] font-display uppercase">
+                                Вручную
+                            </button>
+                            <button onclick="resetStepsToday()" class="p5-cutout-btn bg-black text-white/60 hover:text-p5-red py-1.5 text-[10px] font-display uppercase">
+                                Сброс
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Daily Category Filter Pills (Visible only on 'daily' sub-tab) -->
+            <div id="daily-category-bar" class="flex gap-1.5 overflow-x-auto pb-1.5 no-scrollbar">
+                <button onclick="filterDailyCategory('all')" id="dcat-all" class="p5-cutout-btn px-3 py-1.5 text-xs font-display uppercase whitespace-nowrap bg-p5-red text-white">
+                    ВСЕ (32)
+                </button>
+                <button onclick="filterDailyCategory('ege')" id="dcat-ege" class="p5-cutout-btn px-3 py-1.5 text-xs font-display uppercase whitespace-nowrap bg-p5-dark text-white/80">
+                    📚 ЕГЭ / УЧЁБА
+                </button>
+                <button onclick="filterDailyCategory('clean')" id="dcat-clean" class="p5-cutout-btn px-3 py-1.5 text-xs font-display uppercase whitespace-nowrap bg-p5-dark text-white/80">
+                    🧹 УБОРКА / БЫТ
+                </button>
+                <button onclick="filterDailyCategory('steps')" id="dcat-steps" class="p5-cutout-btn px-3 py-1.5 text-xs font-display uppercase whitespace-nowrap bg-p5-dark text-white/80">
+                    👟 ШАГИ / ФОРМА
+                </button>
+                <button onclick="filterDailyCategory('tech')" id="dcat-tech" class="p5-cutout-btn px-3 py-1.5 text-xs font-display uppercase whitespace-nowrap bg-p5-dark text-white/80">
+                    📸 ФОТО / ПРОЕКТЫ
+                </button>
+                <button onclick="filterDailyCategory('glowup')" id="dcat-glowup" class="p5-cutout-btn px-3 py-1.5 text-xs font-display uppercase whitespace-nowrap bg-p5-dark text-white/80">
+                    ⚡ ГЛОУ-АП / РЕЖИМ
+                </button>
+            </div>
+
+            <!-- Context Info Bar for Weekly / Story -->
+            <div id="quest-context-bar" class="hidden p5-card p-3 items-center justify-between gap-2">
+                <span id="quest-context-text" class="p5-card-inner text-xs font-bold text-white"></span>
+                <button id="quest-context-action" onclick="resetWeekliesPrompt()" class="p5-cutout-btn px-2.5 py-1 bg-p5-red text-white text-[10px] font-display uppercase shrink-0">
+                    НОВЫЙ ЦИКЛ
+                </button>
+            </div>
+
+            <!-- Quests List Container -->
+            <div id="quests-list" class="space-y-3">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: MEDIA QUEUE (МЕДИА-ПЛАН) ================= -->
+        <section id="tab-media" class="hidden space-y-3.5">
+            <!-- Top Rule Banner -->
+            <div class="p5-card p-3.5">
+                <div class="p5-card-inner space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="bg-p5-red text-white text-[10px] font-display uppercase tracking-widest px-2 py-0.5 border border-white">
+                            СТРОГАЯ ОЧЕРЕДЬ ТАЙТЛОВ // ПОРЦИОННЫЙ РЕЖИМ
+                        </span>
+                        <i class="fa-solid fa-layer-group text-p5-yellow text-sm"></i>
+                    </div>
+                    <p class="text-xs text-white/90 leading-relaxed">
+                        Никакого распыления на 10 тайтлов сразу. Игры — строго <strong>1 квест / миссия за присест</strong>. За каждую закрытую порцию получаешь <strong>+15 PTS</strong>, за полное прохождение тайтла — <strong>+100 PTS</strong> и переход к следующему.
+                    </p>
+                    <div class="p-2 bg-black border-2 border-p5-yellow text-[11px] text-p5-yellow font-mono flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-p5-red"></i>
+                        <span>Правило: <strong>FIFA 19</strong> и <strong>NBA 2K14</strong> — строго когда собираетесь с кентами!</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sequential Media Queues Container -->
+            <div id="media-queues-container" class="space-y-3.5">
+                <!-- Populated via JS -->
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: SHOP & INVENTORY (ЧЁРНЫЙ РЫНОК) ================= -->
+        <section id="tab-shop" class="hidden space-y-3.5">
+            <!-- Sub-navigation: Витрина vs Инвентарь -->
+            <div class="flex items-center justify-between gap-2">
+                <div class="grid grid-cols-2 gap-1.5 flex-1">
+                    <button onclick="switchShopSubTab('store')" id="stab-store" class="p5-cutout-btn py-1.5 px-3 text-xs font-display uppercase bg-p5-red text-white">
+                        <i class="fa-solid fa-skull mr-1"></i> ЧЁРНЫЙ РЫНОК
+                    </button>
+                    <button onclick="switchShopSubTab('inventory')" id="stab-inventory" class="p5-cutout-btn py-1.5 px-3 text-xs font-display uppercase bg-p5-dark text-white/75 relative">
+                        <i class="fa-solid fa-box-open mr-1"></i> ИНВЕНТАРЬ
+                        <span id="inventory-badge" class="hidden ml-1 px-1.5 py-0.2 bg-p5-yellow text-black font-mono text-[10px] font-black">0</span>
+                    </button>
+                </div>
+
+                <!-- Add Custom Reward Button -->
+                <button onclick="openAddRewardModal()" class="p5-cutout-btn px-2.5 h-9 bg-p5-yellow text-black flex items-center justify-center gap-1 text-xs font-display uppercase shrink-0" title="Добавить свою награду">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>ЛОТ</span>
+                </button>
+            </div>
+
+            <!-- Shop Storefront View -->
+            <div id="shop-store-view" class="space-y-3.5">
+                <!-- Category Filter Pills -->
+                <div class="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                    <button onclick="filterShopCategory('all')" id="scat-all" class="p5-cutout-btn px-3 py-1 text-xs font-display uppercase whitespace-nowrap bg-p5-red text-white">
+                        ВСЕ ЛОТЫ
+                    </button>
+                    <button onclick="filterShopCategory('boost')" id="scat-boost" class="p5-cutout-btn px-3 py-1 text-xs font-display uppercase whitespace-nowrap bg-p5-dark text-white/80">
+                        ⚡ ТОНИКИ / ЭНЕРГОСЫ
+                    </button>
+                    <button onclick="filterShopCategory('chill')" id="scat-chill" class="p5-cutout-btn px-3 py-1 text-xs font-display uppercase whitespace-nowrap bg-p5-dark text-white/80">
+                        🎮 ДОСУГ / СТРИТФУД
+                    </button>
+                    <button onclick="filterShopCategory('epic')" id="scat-epic" class="p5-cutout-btn px-3 py-1 text-xs font-display uppercase whitespace-nowrap bg-p5-dark text-white/80">
+                        💎 СОКРОВИЩА (850+)
+                    </button>
+                </div>
+
+                <div id="shop-items-list" class="space-y-3">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Inventory View (Bought Coupons) -->
+            <div id="shop-inventory-view" class="hidden space-y-3">
+                <div class="p5-card p-3 text-xs text-white flex items-center gap-2.5">
+                    <i class="fa-solid fa-ticket text-p5-yellow text-base"></i>
+                    <span class="p5-card-inner">Купленные купоны лежат здесь. Жми <strong>«АКТИВИРОВАТЬ»</strong>, когда реально открываешь банку за 95 ₽ или садишься за доп. миссию.</span>
+                </div>
+                <div id="inventory-items-list" class="space-y-3">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 4: CHARACTER, ENERGY & BACKUP (СТАТЫ) ================= -->
+        <section id="tab-stats" class="hidden space-y-4">
+            <!-- Phantom Thief Hero Card -->
+            <div class="p5-card-red p-4 relative overflow-hidden">
+                <div class="p5-card-inner flex items-center justify-between">
+                    <div>
+                        <span class="bg-black text-p5-yellow text-[10px] font-display uppercase tracking-widest px-2 py-0.5 border border-white">
+                            PHANTOM THIEF // КРАСНОСЕЛЬСКОЕ → ИБ
+                        </span>
+                        <h2 class="text-xl font-display uppercase text-white mt-1 tracking-wide">ЛЕВОН // JOKER-TRACK</h2>
+                        <p id="profile-rank-subtitle" class="text-xs font-mono text-p5-yellow font-bold">Ранг: Фантом-Новичок (LV. 1)</p>
+                    </div>
+                    <div class="text-right font-mono bg-black/90 border-2 border-white px-2.5 py-1.5">
+                        <div class="text-[9px] text-white/70">ВСЕГО ОПЫТА</div>
+                        <div id="profile-total-xp" class="text-sm font-black text-p5-yellow">0 XP</div>
+                        <div class="text-[9px] text-white/70 mt-0.5">МИССИЙ ЗАКРЫТО</div>
+                        <div id="profile-quests-done" class="text-xs font-black text-white">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. ENERGY DRINK MODULE (95 RUB + EDITABLE + SLIP-UP BUTTON) -->
+            <div class="p5-card-yellow p-4 space-y-3">
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 bg-p5-red text-white border-2 border-white flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-display uppercase text-white tracking-wider">КОНТРОЛЬ ЭНЕРГОСОВ</h3>
+                                <p class="text-[11px] text-white/75">Банка только по купону или чистый сейв в карман</p>
+                            </div>
+                        </div>
+                        <button onclick="openEditCanPriceModal()" class="p5-cutout-btn bg-p5-yellow text-black text-[11px] font-mono font-black px-2.5 py-1.5 shrink-0">
+                            Банка: <strong id="can-price-label">95</strong> ₽ ✎
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="p-2.5 bg-black border-2 border-white text-center">
+                            <div class="text-[9px] font-display uppercase text-white/70">ЧИСТЫХ ДНЕЙ</div>
+                            <div id="energy-clean-days" class="text-base font-mono font-black text-white mt-0.5">0</div>
+                        </div>
+                        <div class="p-2.5 bg-black border-2 border-p5-yellow text-center">
+                            <div class="text-[9px] font-display uppercase text-p5-yellow">СЭКОНОМЛЕНО</div>
+                            <div id="energy-saved-rub" class="text-base font-mono font-black text-p5-yellow mt-0.5">0 ₽</div>
+                        </div>
+                        <div class="p-2.5 bg-black border-2 border-white text-center">
+                            <div class="text-[9px] font-display uppercase text-white/70">ПО ЛИЦЕНЗИИ</div>
+                            <div id="energy-licensed-used" class="text-base font-mono font-black text-p5-red mt-0.5">0 шт</div>
+                        </div>
+                    </div>
+
+                    <button onclick="triggerEnergySlipUp()" class="p5-cutout-btn w-full py-2 px-3 bg-black hover:bg-p5-red text-white text-xs font-display uppercase flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-skull-crossbones text-p5-red"></i>
+                        <span>СОРВАЛСЯ (КУПИЛ БЕЗ ЛИЦЕНЗИИ: -40 PTS)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4 Core RPG Attributes Grid (P5 Social Stats Style) -->
+            <div>
+                <h3 class="text-xs font-display uppercase tracking-widest text-p5-yellow mb-2 px-1">★ ХАРАКТЕРИСТИКИ ФАНТОМА (SOCIAL STATS)</h3>
+                <div class="grid grid-cols-2 gap-3" id="stats-cards-grid">
+                    <!-- Populated via JS: INT, TECH, VIT, DISC -->
+                </div>
+            </div>
+
+            <!-- Captured Photo Log -->
+            <div class="p5-card p-3.5">
+                <div class="p5-card-inner space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-display uppercase text-p5-yellow">📸 АРХИВ ФОТО-ОХОТЫ</span>
+                        <span id="photo-log-count" class="text-[10px] font-mono text-white/70">0 кадров</span>
+                    </div>
+                    <div id="photo-history-list" class="space-y-1.5 max-h-36 overflow-y-auto">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cycle Management Card -->
+            <div class="p5-card p-4">
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-p5-red"></i>
+                            <h3 class="text-xs font-display uppercase text-white tracking-wider">УПРАВЛЕНИЕ ЦИКЛАМИ</h3>
+                        </div>
+                        <button onclick="toggleSound()" class="text-xs font-mono text-p5-yellow">
+                            ЗВУК: <span id="profile-sound-status">ВКЛ</span>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button onclick="openEndDayModal()" class="p5-cutout-btn py-2.5 px-3 bg-p5-red text-white font-display uppercase text-xs flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-moon"></i> ЗАВЕРШИТЬ ДЕНЬ
+                        </button>
+                        <button onclick="resetWeekliesPrompt()" class="p5-cutout-btn py-2.5 px-3 bg-white text-black font-display uppercase text-xs flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-calendar-week"></i> СБРОС НЕДЕЛИ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Backup Export / Import (Бэкап сейва) -->
+            <div class="p5-card p-4">
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk text-p5-yellow"></i>
+                            <h3 class="text-xs font-display uppercase text-white tracking-wider">СЕЙВ-ФАЙЛ (ЭКСПОРТ / ИМПОРТ)</h3>
+                        </div>
+                        <span class="text-[10px] font-mono text-white/60">lifeos_state</span>
+                    </div>
+                    <p class="text-xs text-white/80 leading-relaxed">
+                        Все очки, стрик и купленные купоны автоматически сохраняются в памяти телефона и не слетают при обновлении `index.html`.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button onclick="exportBackup()" class="p5-cutout-btn py-2.5 px-3 bg-p5-yellow text-black font-display uppercase text-xs flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-copy"></i> ЭКСПОРТ СЕЙВА
+                        </button>
+                        <button onclick="openImportModal()" class="p5-cutout-btn py-2.5 px-3 bg-p5-dark text-white font-display uppercase text-xs flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-file-import"></i> ИМПОРТ СЕЙВА
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity History Log -->
+            <div>
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <h3 class="text-xs font-display uppercase tracking-wider text-white/80">ЖУРНАЛ ОПЕРАЦИЙ</h3>
+                    <button onclick="openHardResetModal()" class="text-[10px] font-display uppercase text-p5-red hover:underline">
+                        ПОЛНЫЙ СБРОС
+                    </button>
+                </div>
+                <div id="activity-log-list" class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== PERSONA 5 COMMAND MENU BOTTOM NAVIGATION ==================== -->
+    <nav class="fixed bottom-0 left-0 right-0 z-30 bg-[#060606]/95 backdrop-blur-md border-t-4 border-white px-2 py-2 shadow-[0_-6px_0_#E60012]">
+        <div class="max-w-md mx-auto grid grid-cols-4 gap-1.5">
+            <button onclick="switchMainTab('quests')" id="nav-quests" class="p5-cutout-btn flex flex-col items-center justify-center py-1.5 bg-p5-red text-white">
+                <i class="fa-solid fa-crosshairs text-sm"></i>
+                <span class="text-[10px] font-display uppercase mt-0.5 tracking-wider">МИССИИ</span>
+            </button>
+            <button onclick="switchMainTab('media')" id="nav-media" class="p5-cutout-btn flex flex-col items-center justify-center py-1.5 bg-p5-dark text-white/75">
+                <i class="fa-solid fa-tv text-sm"></i>
+                <span class="text-[10px] font-display uppercase mt-0.5 tracking-wider">МЕДИА</span>
+            </button>
+            <button onclick="switchMainTab('shop')" id="nav-shop" class="p5-cutout-btn flex flex-col items-center justify-center py-1.5 bg-p5-dark text-white/75 relative">
+                <i class="fa-solid fa-skull text-sm"></i>
+                <span class="text-[10px] font-display uppercase mt-0.5 tracking-wider">РЫНОК</span>
+                <span id="nav-inv-dot" class="hidden absolute top-1 right-4 w-2.5 h-2.5 bg-p5-yellow border border-black"></span>
+            </button>
+            <button onclick="switchMainTab('stats')" id="nav-stats" class="p5-cutout-btn flex flex-col items-center justify-center py-1.5 bg-p5-dark text-white/75">
+                <i class="fa-solid fa-star text-sm"></i>
+                <span class="text-[10px] font-display uppercase mt-0.5 tracking-wider">СТАТЫ</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+    <div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm pointer-events-none space-y-2"></div>
+
+    <!-- ==================== UNIVERSAL MODAL OVERLAY ==================== -->
+    <div id="modal-overlay" class="fixed inset-0 z-40 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div id="modal-content" class="w-full max-w-sm p5-card p-5 space-y-4 animate-p5-pop">
+            <!-- Dynamically populated modal content -->
+        </div>
+    </div>
+
+    <!-- ==================== APPLICATION LOGIC ==================== -->
+    <script>
+        const STORAGE_KEY = 'lifeos_state';
+        const LEGACY_STORAGE_KEY = 'cyberlife_rpg_levon_v1';
+
+        // Persona 5 Phantom Thief Rank Ladder
+        const RANKS = [
+            { minLvl: 1,  title: 'Фантом-Новичок' },
+            { minLvl: 3,  title: 'Взломщик Мементос' },
+            { minLvl: 5,  title: 'Оператор Fedora' },
+            { minLvl: 8,  title: 'Охотник за Тенями' },
+            { minLvl: 12, title: 'Инженер RP2040' },
+            { minLvl: 16, title: 'Ас Видеомонтажа' },
+            { minLvl: 20, title: 'Мастер Конфидантов' },
+            { minLvl: 25, title: 'Призрак Кибербеза' },
+            { minLvl: 30, title: 'ДЖОКЕР // ПОВЕЛИТЕЛЬ РУТА' }
+        ];
+
+        // 4 Core Social / RPG Stats Metadata (Persona 5 Royal Inspired)
+        const STAT_META = {
+            INT:  { name: 'ЗНАНИЯ (INT)',     desc: 'ЕГЭ: Профиль, Русский, база ИБ', color: 'text-p5-yellow', bg: 'bg-p5-red', icon: 'fa-graduation-cap' },
+            TECH: { name: 'МАСТЕРСТВО (TECH)', desc: 'Инфа, Фото Nikon/S21, DaVinci, RP2040', color: 'text-white', bg: 'bg-p5-red', icon: 'fa-screwdriver-wrench' },
+            VIT:  { name: 'ТОНУС (VIT)',      desc: 'Шаги 6к/10к, Воркаут, Уборка, Кухня', color: 'text-p5-yellow', bg: 'bg-p5-red', icon: 'fa-bolt' },
+            DISC: { name: 'ВОЛЯ (DISC)',      desc: 'Порядок в комнате, Стрик, Без энергосов', color: 'text-white', bg: 'bg-p5-red', icon: 'fa-shield-halved' }
+        };
+
+        // 36 Concrete Daily Photo Prompts for Nikon D5100 (18-55mm) & Samsung Galaxy S21 FE
+        const PHOTO_PROMPTS = [
+            { title: 'Контрастный силуэт на фоне заката или яркого окна', tip: 'Экспозиция по свету, прикрой диафрагму до f/8' },
+            { title: 'Макро-деталь печатной платы, микросхемы или RP2040', tip: 'На 55мм подойди максимально близко, боковой свет от лампы' },
+            { title: 'Геометрия уличных проводов и столбов против неба', tip: 'Ищи диагонали в кадре, ч/б или холодный баланс белого' },
+            { title: 'Отражение света в луже, стекле или экране монитора', tip: 'Снимай под острым углом почти вплотную к поверхности' },
+            { title: 'Предметка: любимый айтем из твоего EDC (часы Casio WR 50M / IEM 7Hz Zero:2)', tip: 'Тёмный фон и один направленный источник света сбоку' },
+            { title: 'Текстура компакт-диска или корешков манги на полке', tip: 'Поймай блик лазера/радугу на рабочей поверхности CD' },
+            { title: 'Ночной уличный фонарь в темноте или тумане', tip: 'Зафиксируй хват, ISO 400–800, уведи баланс белого в синий/янтарный' },
+            { title: 'Кадр с самой нижней точки («ракурс муравья»)', tip: 'Опусти камеру почти к земле, чтобы объект казался монументальным' },
+            { title: 'Длинная тень на асфальте или стене комнаты', tip: 'Лучше всего ловить утром или перед самым закатом' },
+            { title: 'Уличный минимализм: один яркий красный или жёлтый объект на сером фоне', tip: 'Эстетика Persona 5 — оставь максимум пустого пространства' },
+            { title: 'Движение в кадре с проводкой (проезжающая машина или силуэт)', tip: 'Выдержка 1/15 – 1/30 сек, веди объектив синхронно с объектом' },
+            { title: 'Крупный план кроссовок (Margiela Replica / Asics Gel-Kayano 14 / Vans) в движении или на ступенях', tip: 'Фокус на фактуру замши/кожи, размытый задний план' },
+            { title: 'Киберпанк-уголок: свечение мониторов и клавиатуры в тёмной комнате', tip: 'Выключи верхний свет, снимай на открытой диафрагме' },
+            { title: 'Ритм и повторение: ряд окон, забор, ступени или клавиши', tip: 'Построй строгую симметрию или уведи линию в угол кадра' },
+            { title: 'Естественная рамка (кадр внутри кадра: через дверной проём, ветки или арку)', tip: 'Передний план в лёгком расфокусе добавит глубины' },
+            { title: 'Пар от горячего чая или домашней еды в контровом свете', tip: 'Поставь чашку против света из окна на тёмном фоне' },
+            { title: 'Фактура металла или дерева крупным планом', tip: 'Боковой жёсткий свет подчеркнёт каждую царапину и рельеф' },
+            { title: 'Абстрактное боке: расфокусированные огни улицы или индикаторы техники', tip: 'Переключи объектив Nikon D5100 в MF и выкрути кольцо фокуса' },
+            { title: 'Геометрия теней от жалюзи, штор или решётки на стене', tip: 'Экспокоррекция в минус (-1 EV) для глубоких чёрных теней' },
+            { title: 'Портрет консоли (PS3 Slim / PSP Street / геймпад) в драматичном свете', tip: 'Протри пыль перед кадром, подсвети экраном телефона' },
+            { title: 'Контраст старого и нового: винтажная деталь рядом с современным гаджетом', tip: 'Положи CD-диск или кабель рядом с S21 FE или MacBook' },
+            { title: 'Небо и облака с драматичной фактурой перед сумерками', tip: 'Оставь нижнюю треть кадра тёмным силуэтом крыш или деревьев' },
+            { title: 'Разворот любимой манги (Berserk / Vagabond / Пунпун) с малой глубиной резкости', tip: 'Фокус на один конкретный фрейм, остальное в мягком боке' },
+            { title: 'Капли воды на стекле, металле или листе', tip: 'Включи макро-режим или зум 55мм с минимальной дистанции' },
+            { title: 'Симметрия коридора, дороги или тропинки, уходящей вдаль', tip: 'Встань ровно по центру и выровняй горизонт' },
+            { title: 'Кадр в стиле обложки музыкального альбома (Deftones / Aphex Twin вайб)', tip: 'Зернистость, лёгкий смаз или нестандартный угол наклона (голландский угол)' },
+            { title: 'Руки в работе: пайка, сборка железа, нарезка на кухне или игра на геймпаде', tip: 'Серийная съёмка или таймер 3 сек' },
+            { title: 'Одинокое дерево или столб на фоне открытого пространства', tip: 'Правило третей: помести объект на пересечении линий сетки' },
+            { title: 'Отражение в зеркале заднего вида или оконном стекле с двойной экспозицией', tip: 'Сфокусируйся на отражении, а не на раме' },
+            { title: 'Свет сквозь прозрачный предмет (стакан воды, линза, пластик)', tip: 'Лови преломление лучей (каустику) на столе' },
+            { title: 'Строгий чёрно-белый кадр с высоким контрастом (нуар)', tip: 'Ищи жёсткий свет и глубокие тени без полутонов' },
+            { title: 'Диагональная композиция: лестница, перила или тень через весь кадр', tip: 'Линия должна вести взгляд из одного угла в другой' },
+            { title: 'Крупный план объектива или видоискателя (S21 FE снимает Nikon D5100 или наоборот)', tip: 'Поймай цветной перелив просветляющего покрытия линзы' },
+            { title: 'Вечернее окно снаружи или вид из окна в сумерках (синий час)', tip: 'Контраст тёплого комнатного света и холодной синей улицы' },
+            { title: 'Текстура ткани/принта любимой шмотки (Undercover / Гоша / зипка)', tip: 'Деталь шва, молнии или принта под углом' },
+            { title: 'Случайный стрит-кадр во время прогулки на 6 000 шагов', tip: 'Не думай долго: увидел интересный свет — сразу снимай' }
+        ];
+
+        // Master Catalog of 32 Dailies, 7 Weeklies, and 6 Bosses/Palaces
+        function getMasterQuests() {
+            return [
+                // ================= 1. ЕГЭ / УЧЁБА (ege) — 10 Dailies =================
+                {
+                    id: 'd_school',
+                    type: 'daily',
+                    category: 'ege',
+                    title: 'Вывезти смену в школе (08:00–13:30) и вернуться к 14:00',
+                    desc: 'Без прогулов, вернуться домой вовремя и не залипнуть в рилсы после уроков',
+                    pts: 15,
+                    stat: 'DISC',
+                    days: [1, 2, 3, 4, 5],
+                    done: false
+                },
+                {
+                    id: 'd_math_p1',
+                    type: 'daily',
+                    category: 'ege',
+                    title: 'Профиль: прорешать 1-ю часть без ошибок (№1–12)',
+                    desc: 'Железная база первой части на скорость и точность вычислений',
+                    pts: 25,
+                    stat: 'INT',
+                    done: false
+                },
+                {
+                    id: 'd_math_p2',
+                    type: 'daily',
+                    category: 'ege',
+                    title: 'Профиль: разобрать 1–2 задачи из 2-й части (№13, 15, 16, параметр/геома)',
+                    desc: 'Уравнения, неравенства, экономика или планиметрия с полным оформлением',
+                    pts: 35,
+                    stat: 'INT',
+                    done: false
+                },
+                {
+                    id: 'd_info_code',
+                    type: 'daily',
+                    category: 'ege',
+                    title: 'Инфа: 3–5 задач на Python (скрипт, перебор, графы или таблицы)',
+                    desc: 'Практика КЕГЭ на Fedora Linux (задания 2, 5, 6, 8, 9, 12, 14, 15, 16, 17, 19–21, 23)',
+                    pts: 25,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 'd_info_hard',
+                    type: 'daily',
+                    category: 'ege',
+                    title: 'Инфа: разбор сложного номера второй части (№24–27)',
+                    desc: 'Обработка строк, делители, жадные алгоритмы или динамическое программирование',
+                    pts: 35,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 'd_rus',
+                    type: 'daily',
+                    category: 'ege',
+                    title: 'Русский: блок тестовой части (орфография/пунктуация) или абзац сочинения',
+                    desc: 'Отработать корни/приставки/Н-НН (№9–15), запятые (№16–21) или структуру клише',
+                    pts: 20,
+                    stat: 'INT',
+                    done: false
+                },
+                {
+                    id: 'd_tutor_math',
+                    type: 'daily',
+                    category: 'ege',
+                    title: 'Отработать репетитора по Математике (ВТ 17:00 / ЧТ 16:00)',
+                    desc: 'Плотный разбор с репетитором по расписанию вторника и четверга',
+                    pts: 35,
+                    stat: 'INT',
+                    days: [2, 4],
+                    done: false
+                },
+                {
+                    id: 'd_tutor_rus',
+                    type: 'daily',
+                    category: 'ege',
+                    title: 'Отработать репетитора по Русскому (ПТ 17:00)',
+                    desc: 'Пятничное занятие в 17:00 без опозданий и с готовым разбором',
+                    pts: 35,
+                    stat: 'INT',
+                    days: [5],
+                    done: false
+                },
+                {
+                    id: 'd_tutor_hw',
+                    type: 'daily',
+                    category: 'ege',
+                    title: 'Закрыть домашку от репетитора без долгов на последний момент',
+                    desc: 'Сделать ДЗ заранее, а не за 20 минут до созвона',
+                    pts: 25,
+                    stat: 'DISC',
+                    done: false
+                },
+                {
+                    id: 'd_sun_study',
+                    type: 'daily',
+                    category: 'ege',
+                    title: 'Воскресный спец-бот (выходной — плотный блок подготовки)',
+                    desc: 'Воскресный фокус-забег по ЕГЭ согласно твоему плану',
+                    pts: 40,
+                    stat: 'INT',
+                    days: [0],
+                    done: false
+                },
+
+                // ================= 2. УБОРКА / БЫТ (clean) — 6 Dailies =================
+                {
+                    id: 'd_clean_desk',
+                    type: 'daily',
+                    category: 'clean',
+                    title: 'Зачистка рабочего спота (стол у ПК и MacBook A1990)',
+                    desc: 'Убрать кружки, пустые банки, обёртки и бумажки, протереть поверхность стола и коврик',
+                    pts: 15,
+                    stat: 'DISC',
+                    done: false
+                },
+                {
+                    id: 'd_clean_bed',
+                    type: 'daily',
+                    category: 'clean',
+                    title: 'Кровать и шмотки по местам (ликвидация «стула с одеждой»)',
+                    desc: 'Заправить постель после подъёма и развесить вещи в шкаф вместо кучи на стуле',
+                    pts: 15,
+                    stat: 'DISC',
+                    done: false
+                },
+                {
+                    id: 'd_clean_floor',
+                    type: 'daily',
+                    category: 'clean',
+                    title: 'Экспресс-уборка комнаты (пол и полки с мангой/CD/консолями)',
+                    desc: 'Подмести или пропылесосить пол, смахнуть пыль с полок, PS3 Slim и муз. центра Samsung',
+                    pts: 20,
+                    stat: 'VIT',
+                    done: false
+                },
+                {
+                    id: 'd_clean_kitchen',
+                    type: 'daily',
+                    category: 'clean',
+                    title: 'Чистая кухня после себя (посуда и плита/стол)',
+                    desc: 'Помыть за собой тарелки и сковородку сразу после еды, не оставляя гору в раковине',
+                    pts: 15,
+                    stat: 'DISC',
+                    done: false
+                },
+                {
+                    id: 'd_clean_cables',
+                    type: 'daily',
+                    category: 'clean',
+                    title: 'Порядок в девайсах и кабелях на базе',
+                    desc: 'Аккуратно смотать 7Hz Zero:2, кабели зарядок, положить геймпады и PSP Street на место',
+                    pts: 10,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 'd_cook',
+                    type: 'daily',
+                    category: 'clean',
+                    title: 'Домашняя готовка (приготовить нормальную горячую еду)',
+                    desc: 'Сготовить полноценный обед/ужин своими руками (школа бати, специи, мясо/гарнир)',
+                    pts: 20,
+                    stat: 'VIT',
+                    done: false
+                },
+
+                // ================= 3. ШАГИ / ФОРМА (steps) — 5 Dailies =================
+                {
+                    id: 'd_steps_6k',
+                    type: 'daily',
+                    category: 'steps',
+                    title: 'Базовый маршрут: 6 000+ шагов за день',
+                    desc: 'Прогулка на воздухе с 7Hz Salnotes Zero:2 (засчитывается автоматически из трекера шагов)',
+                    pts: 20,
+                    stat: 'VIT',
+                    done: false
+                },
+                {
+                    id: 'd_steps_10k',
+                    type: 'daily',
+                    category: 'steps',
+                    title: 'Марш-бросок Фантома: 10 000+ шагов за день',
+                    desc: 'Плотная дневная норма движения без сидения дома (автозачёт при 10 000 шагов)',
+                    pts: 35,
+                    stat: 'VIT',
+                    done: false
+                },
+                {
+                    id: 'd_warmup',
+                    type: 'daily',
+                    category: 'steps',
+                    title: 'Утренняя разминка суставов и спины (7–10 минут)',
+                    desc: 'Разогнать кровь после сна: шея, плечи, грудной отдел, поясница',
+                    pts: 15,
+                    stat: 'VIT',
+                    done: false
+                },
+                {
+                    id: 'd_workout',
+                    type: 'daily',
+                    category: 'steps',
+                    title: 'Домашняя силовая база (отжимания, пресс, присед)',
+                    desc: '3–4 плотных рабочих подхода в комнате без отговорок про отсутствие зала',
+                    pts: 25,
+                    stat: 'VIT',
+                    done: false
+                },
+                {
+                    id: 'd_posture',
+                    type: 'daily',
+                    category: 'steps',
+                    title: 'Разгрузка спины и глаз между катками и ботом',
+                    desc: 'Оторваться от монитора, выпрямить осанку и сделать растяжку грудных мышц',
+                    pts: 10,
+                    stat: 'VIT',
+                    done: false
+                },
+
+                // ================= 4. ФОТО / ПРОЕКТЫ (tech) — 5 Dailies =================
+                {
+                    id: 'd_photo_daily',
+                    type: 'daily',
+                    category: 'tech',
+                    title: 'Кадр дня: снять сегодняшнюю тему из Фото-контракта',
+                    desc: 'Сделать осмысленный кадр дня на Nikon D5100 или S21 FE по заданию сверху',
+                    pts: 25,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 'd_photo_nikon',
+                    type: 'daily',
+                    category: 'tech',
+                    title: 'Практика на Nikon D5100 (18-55mm) в ручном режиме M/A или цветокор',
+                    desc: 'Работа с выдержкой, диафрагмой, ISO или проявка/цветокоррекция отснятого материала',
+                    pts: 30,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 'd_edit',
+                    type: 'daily',
+                    category: 'tech',
+                    title: 'Видеомонтаж: DaVinci Resolve (MacBook A1990) / Kdenlive',
+                    desc: 'Минимум 40 минут работы: таймлайн, кейфреймы, композитинг или саунд-дизайн',
+                    pts: 30,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 'd_manga_tl',
+                    type: 'daily',
+                    category: 'tech',
+                    title: 'Пайплайн перевода манги (BallonsTranslator + Gemini Flash)',
+                    desc: 'Прогнать страницы через pdftoppm, перевести на GTX 1650 и собрать главу в img2pdf',
+                    pts: 30,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 'd_diy_linux',
+                    type: 'daily',
+                    category: 'tech',
+                    title: 'Железо и Linux (RP2040 CD-плеер, пайка, Fedora KDE / EasyEffects)',
+                    desc: 'Поковырять DIY плеер (Pico + SATA привод + OLED + I2S DAC), аудио-тракт или сеть',
+                    pts: 25,
+                    stat: 'TECH',
+                    done: false
+                },
+
+                // ================= 5. ГЛОУ-АП / РЕЖИМ (glowup) — 6 Dailies =================
+                {
+                    id: 'd_no_energy',
+                    type: 'daily',
+                    category: 'glowup',
+                    title: 'Чистый день без энергоса (+95 ₽ в сейв)',
+                    desc: 'Пройти день на воде/чае без слива бабок на банку на автопилоте',
+                    pts: 25,
+                    stat: 'DISC',
+                    isEnergyClean: true,
+                    done: false
+                },
+                {
+                    id: 'd_hair_skin',
+                    type: 'daily',
+                    category: 'glowup',
+                    title: 'Уход за собой: умывание + курс для волос Synergetic',
+                    desc: 'Чистая кожа лица и уход за волосами (шампунь + кондиционер Synergetic)',
+                    pts: 15,
+                    stat: 'VIT',
+                    done: false
+                },
+                {
+                    id: 'd_fit_prep',
+                    type: 'daily',
+                    category: 'glowup',
+                    title: 'Собрать лук и EDC с вечера',
+                    desc: 'Подготовить шмот (Undercover/Гоша/лонгслив/зипка с черепом, Margiela Replica/Asics Kayano 14/Vans, Casio WR 50M, Dickies/Givenchy)',
+                    pts: 15,
+                    stat: 'DISC',
+                    done: false
+                },
+                {
+                    id: 'd_sleep',
+                    type: 'daily',
+                    category: 'glowup',
+                    title: 'Отбой по таймингу (убрать S21 FE до полуночи)',
+                    desc: 'Не скроллить ленту до 3 ночи, сохранить свежую голову на утро',
+                    pts: 20,
+                    stat: 'VIT',
+                    done: false
+                },
+                {
+                    id: 'd_media_limit',
+                    type: 'daily',
+                    category: 'glowup',
+                    title: 'Дисциплина досуга: игры строго порционно (1 квест/миссия)',
+                    desc: 'Никаких многочасовых срывов в будни — закрыл 1 миссию и переключился на дела',
+                    pts: 20,
+                    stat: 'DISC',
+                    done: false
+                },
+                {
+                    id: 'd_reading',
+                    type: 'daily',
+                    category: 'glowup',
+                    title: 'Чтение (глава книги или том бумажной манги/комикса с полки)',
+                    desc: '25–30 минут чтения без телефона (One Piece, Паук, Vagabond, Пунпун, Berserk или классика)',
+                    pts: 20,
+                    stat: 'INT',
+                    done: false
+                },
+
+                // ================= ВИКЛИКИ (weekly) — 7 Quests =================
+                {
+                    id: 'w_probnik_ege',
+                    type: 'weekly',
+                    title: 'Полный пробник ЕГЭ с таймером (Математика / Инфа / Русский)',
+                    desc: 'Написать полный вариант от корки до корки с честным разбором всех ошибок',
+                    pts: 150,
+                    stat: 'INT',
+                    done: false
+                },
+                {
+                    id: 'w_gen_clean',
+                    type: 'weekly',
+                    title: 'Генеральная уборка комнаты и чистка железа',
+                    desc: 'С братом или соло: помыть полы, протереть все полки, продуть пылевые фильтры ПК и оптику Nikon D5100',
+                    pts: 120,
+                    stat: 'DISC',
+                    done: false
+                },
+                {
+                    id: 'w_photo_series',
+                    type: 'weekly',
+                    title: 'Фото-серия недели: отобрать и обработать 5 лучших кадров',
+                    desc: 'Скинуть отснятое с Nikon D5100 / S21 FE, сделать цветокор и собрать мини-сет',
+                    pts: 100,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 'w_steps_50k',
+                    type: 'weekly',
+                    title: 'Недельный марафон шагов: 50 000+ шагов суммарно за 7 дней',
+                    desc: 'Держать высокую физическую активность всю неделю без застоя',
+                    pts: 130,
+                    stat: 'VIT',
+                    done: false
+                },
+                {
+                    id: 'w_manga_chap',
+                    type: 'weekly',
+                    title: 'Перевести и собрать полную главу манги в PDF',
+                    desc: 'Полный прогон через BallonsTranslator + Gemini Flash API + img2pdf',
+                    pts: 120,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 'w_edit_render',
+                    type: 'weekly',
+                    title: 'Законченный видео-эдит / сведение звука в DaVinci Resolve',
+                    desc: 'Довести проект на MacBook Pro A1990 или ПК до финального рендера',
+                    pts: 130,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 'w_clean_7days',
+                    type: 'weekly',
+                    title: '7 дней подряд без единого купленного энергоса',
+                    desc: 'Недельный стрик чистоты (+665 ₽ чистой экономии в карман)',
+                    pts: 140,
+                    stat: 'DISC',
+                    done: false
+                },
+
+                // ================= ДВОРЦЫ / БОССЫ СЮЖЕТКИ (story) — 6 Palaces =================
+                {
+                    id: 's_palace_math',
+                    type: 'story',
+                    title: 'ДВОРЕЦ 1: Железные 75+ баллов на пробнике по Профильной математике',
+                    desc: 'Безошибочная первая часть + уверенный набор баллов во второй части',
+                    pts: 400,
+                    stat: 'INT',
+                    done: false
+                },
+                {
+                    id: 's_palace_inf',
+                    type: 'story',
+                    title: 'ДВОРЕЦ 2: Пробить 80+ баллов на пробнике по Информатике (КЕГЭ)',
+                    desc: 'Автоматизм на задачах 1–23 и взятие сложных номеров 24–27 на Python',
+                    pts: 400,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 's_palace_rus',
+                    type: 'story',
+                    title: 'ДВОРЕЦ 3: Сочинение ЕГЭ по русскому на 21+/21 балл у репетитора',
+                    desc: 'Идеальная структура, аргументация и грамотность без потери баллов',
+                    pts: 350,
+                    stat: 'INT',
+                    done: false
+                },
+                {
+                    id: 's_palace_cd',
+                    type: 'story',
+                    title: 'ДВОРЕЦ 4: Собрать в корпус DIY CD-плеер на RP2040 с OLED и I2S ЦАП',
+                    desc: 'Завершить хардверный проект: Raspberry Pi Pico + SATA CD-привод + OLED + DAC',
+                    pts: 500,
+                    stat: 'TECH',
+                    done: false
+                },
+                {
+                    id: 's_palace_media',
+                    type: 'story',
+                    title: 'ДВОРЕЦ 5: Закрыть всю очередь тайтлов первого эшелона без долгов по учёбе',
+                    desc: 'Дисциплинированно пройти первые тайтлы из очереди AnimeLIB, ПК и PS3',
+                    pts: 450,
+                    stat: 'DISC',
+                    done: false
+                },
+                {
+                    id: 's_palace_final',
+                    type: 'story',
+                    title: 'ФИНАЛЬНЫЙ БОСС: Сдать ЕГЭ и поступить на Кибербезопасность (ИБ)',
+                    desc: 'Главное Сокровище 11 класса — входной билет в ИБ',
+                    pts: 2000,
+                    stat: 'INT',
+                    done: false
+                }
+            ];
+        }
+
+        // Master Catalog of Shop Items (Black Market)
+        function getMasterShop() {
+            return [
+                {
+                    id: 'shop_energy_1',
+                    category: 'boost',
+                    title: 'Лицензия на банку (95 ₽ / Takemi Buff)',
+                    desc: 'Легально взять банку энергоса за 95 ₽ без чувства вины и штрафа',
+                    cost: 85,
+                    icon: 'fa-bolt',
+                    isEnergyCoupon: true
+                },
+                {
+                    id: 'shop_energy_2',
+                    category: 'boost',
+                    title: 'Оверклок-пак (Банка под ночной проект / сложный разбор)',
+                    desc: 'Спец-допуск под плотный видеомонтаж в DaVinci или кодинг',
+                    cost: 130,
+                    icon: 'fa-fire',
+                    isEnergyCoupon: true
+                },
+                {
+                    id: 'shop_game_chunk',
+                    category: 'boost',
+                    title: 'Сессия: +1 дополнительный квест/миссия на ПК или PS3',
+                    desc: 'Легально продлить игровую сессию сверх базового дневного лимита',
+                    cost: 90,
+                    icon: 'fa-gamepad'
+                },
+                {
+                    id: 'shop_tupnyak',
+                    category: 'boost',
+                    title: 'Право на тупняк в Леблане (40 минут чилла)',
+                    desc: 'Полный отдых посреди дня под музыку без угрызений совести',
+                    cost: 75,
+                    icon: 'fa-couch'
+                },
+                {
+                    id: 'shop_anime_binge',
+                    category: 'chill',
+                    title: 'Аниме / Манга марафон на вечер',
+                    desc: 'Залпом посмотреть несколько серий из очереди AnimeLIB или почитать мангу',
+                    cost: 220,
+                    icon: 'fa-tv'
+                },
+                {
+                    id: 'shop_streetfood',
+                    category: 'chill',
+                    title: 'Стритфуд / Выезд с кентами (FIFA 19 / NBA 2K14)',
+                    desc: 'Посиделки, шаурма/стритфуд или турнир на PS3 Slim с пацанами',
+                    cost: 300,
+                    icon: 'fa-burger'
+                },
+                {
+                    id: 'shop_cheat_day',
+                    category: 'epic',
+                    title: 'Легальный Чит-дей (Щит Заморозки Стрика)',
+                    desc: 'Полный выходной от бота и рутины с сохранением текущего стрика',
+                    cost: 850,
+                    icon: 'fa-shield-halved',
+                    isShieldCoupon: true
+                },
+                {
+                    id: 'shop_diy_part',
+                    category: 'epic',
+                    title: 'Деталь / Расходник под DIY, Фото или Железо',
+                    desc: 'Заказать компонент под RP2040, аксессуар на Nikon D5100 или кабель',
+                    cost: 1000,
+                    icon: 'fa-screwdriver-wrench'
+                },
+                {
+                    id: 'shop_cd_bootleg',
+                    category: 'epic',
+                    title: 'Физический CD / Бутлег или Том Манги на полку',
+                    desc: 'Заказать диск (Deftones, Aphex Twin, Kanye, A$AP Rocky) или печатный том в коллекцию',
+                    cost: 1200,
+                    icon: 'fa-compact-disc'
+                },
+                {
+                    id: 'shop_wardrobe',
+                    category: 'epic',
+                    title: 'Дроп в гардероб (айтем из вишлиста)',
+                    desc: 'Крупная обновка шмота или обуви за закрытый этап',
+                    cost: 2000,
+                    icon: 'fa-shirt'
+                }
+            ];
+        }
+
+        // Master Catalog of Sequential Media Queues
+        function getMasterMediaQueues() {
+            return [
+                {
+                    id: 'mq_anime',
+                    title: 'AnimeLIB (Строго по очереди)',
+                    subtitle: '1 серия / сеанс без параллельного распыления',
+                    icon: 'fa-tv',
+                    unitLabel: '+1 серия (+15 PTS)',
+                    currentIndex: 0,
+                    items: [
+                        { title: 'Одинокий рокер! (Bocchi the Rock!)', chunks: 0, done: false },
+                        { title: 'Киберпанк: Бегущие по краю', chunks: 0, done: false },
+                        { title: 'Моя любовь 999 уровня к Ямаде', chunks: 0, done: false },
+                        { title: 'Код Гиас: Восставший Лелуш', chunks: 0, done: false },
+                        { title: 'Человек-бензопила', chunks: 0, done: false },
+                        { title: 'Пять невест 2', chunks: 0, done: false }
+                    ]
+                },
+                {
+                    id: 'mq_pc',
+                    title: 'ПК-игры (Порционно: 1 квест за сессию)',
+                    subtitle: 'Ryzen 5 3600 / GTX 1650 — без многочасовых загулов',
+                    icon: 'fa-desktop',
+                    unitLabel: '+1 квест/катка (+15 PTS)',
+                    currentIndex: 0,
+                    items: [
+                        { title: 'Kingdom Come: Deliverance', chunks: 0, done: false },
+                        { title: 'South Park: The Stick of Truth', chunks: 0, done: false },
+                        { title: 'Dispatch', chunks: 0, done: false },
+                        { title: 'Dota 2 / CS2 / Baldur\'s Gate 3', chunks: 0, done: false }
+                    ]
+                },
+                {
+                    id: 'mq_ps3',
+                    title: 'PS3 Slim (PS3HEN) / Консоли',
+                    subtitle: 'FIFA 19 и NBA 2K14 — только когда собираетесь с кентами!',
+                    icon: 'fa-gamepad',
+                    unitLabel: '+1 миссия (+15 PTS)',
+                    currentIndex: 0,
+                    items: [
+                        { title: 'Batman: Arkham Origins', chunks: 0, done: false },
+                        { title: 'God of War', chunks: 0, done: false },
+                        { title: 'Tony Hawk', chunks: 0, done: false },
+                        { title: 'Call of Duty: Modern Warfare 3', chunks: 0, done: false },
+                        { title: 'Assassin\'s Creed Rogue', chunks: 0, done: false },
+                        { title: 'Rayman Legends', chunks: 0, done: false }
+                    ]
+                },
+                {
+                    id: 'mq_comics',
+                    title: 'Физические комиксы и манга на полке',
+                    subtitle: 'Чтение бумажных томов по порядку',
+                    icon: 'fa-book-open',
+                    unitLabel: '+1 глава/выпуск (+15 PTS)',
+                    currentIndex: 0,
+                    items: [
+                        { title: 'One Piece (тома 1–5)', chunks: 0, done: false },
+                        { title: 'Современный Человек-Паук (1–10)', chunks: 0, done: false },
+                        { title: 'Самая темная ночь', chunks: 0, done: false },
+                        { title: 'Флэш (1–2)', chunks: 0, done: false },
+                        { title: 'Новые Люди Икс', chunks: 0, done: false },
+                        { title: 'Манга-коллекция (20th Century Boys, Vagabond, Пунпун, Скалолаз, Berserk, Огненный удар, Шаман Кинг)', chunks: 0, done: false }
+                    ]
+                }
+            ];
+        }
+
+        // Default Initial State
+        function getDefaultState() {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            return {
+                version: '3.0-P5R',
+                xp: 0,
+                pts: 0,
+                streak: 0,
+                streakShield: false,
+                soundEnabled: true,
+                lastActiveDate: todayStr,
+                energyPrice: 95,
+                energyPriceUserSet: false,
+                cleanDays: 0,
+                stepsToday: 0,
+                photoRerollOffset: 0,
+                photoHistory: [],
+                energyStats: {
+                    cleanDays: 0,
+                    licensedUsed: 0,
+                    slipUps: 0
+                },
+                stats: {
+                    INT: 0,
+                    TECH: 0,
+                    VIT: 0,
+                    DISC: 0
+                },
+                questsCompletedCount: 0,
+                quests: getMasterQuests(),
+                shop: getMasterShop(),
+                mediaQueues: getMasterMediaQueues(),
+                inventory: [],
+                logs: [
+                    {
+                        time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+                        text: 'LIFE.OS // PHANTOM EDITION (Persona 5 Royal) активирована!',
+                        type: 'info'
+                    }
+                ]
+            };
+        }
+
+        // 100% Backward-Compatible State Migration from v1 / v2 (`lifeos_state`)
+        function loadState() {
+            try {
+                const rawNew = localStorage.getItem(STORAGE_KEY);
+                const rawOld = localStorage.getItem(LEGACY_STORAGE_KEY);
+                const raw = rawNew || rawOld;
+                const def = getDefaultState();
+
+                if (!raw) return def;
+                const parsed = JSON.parse(raw);
+
+                const merged = {
+                    ...def,
+                    ...parsed,
+                    version: '3.0-P5R',
+                    xp: typeof parsed.xp === 'number' ? parsed.xp : (parsed.totalXp || parsed.totalPts || 0),
+                    pts: typeof parsed.pts === 'number' ? parsed.pts : 0,
+                    streak: typeof parsed.streak === 'number' ? parsed.streak : 0,
+                    stepsToday: typeof parsed.stepsToday === 'number' ? parsed.stepsToday : 0,
+                    photoRerollOffset: typeof parsed.photoRerollOffset === 'number' ? parsed.photoRerollOffset : 0,
+                    photoHistory: Array.isArray(parsed.photoHistory) ? parsed.photoHistory : [],
+                    stats: {
+                        INT: (parsed.stats && parsed.stats.INT) || 0,
+                        TECH: (parsed.stats && parsed.stats.TECH) || 0,
+                        VIT: (parsed.stats && parsed.stats.VIT) || 0,
+                        DISC: (parsed.stats && parsed.stats.DISC) || 0
+                    },
+                    inventory: Array.isArray(parsed.inventory) ? parsed.inventory : [],
+                    logs: Array.isArray(parsed.logs) && parsed.logs.length ? parsed.logs : def.logs
+                };
+
+                // Sync cleanDays
+                const savedCleanDays = typeof parsed.cleanDays === 'number'
+                    ? parsed.cleanDays
+                    : (parsed.energyStats && typeof parsed.energyStats.cleanDays === 'number' ? parsed.energyStats.cleanDays : 0);
+
+                merged.cleanDays = savedCleanDays;
+                merged.energyStats = {
+                    cleanDays: savedCleanDays,
+                    licensedUsed: (parsed.energyStats && parsed.energyStats.licensedUsed) || 0,
+                    slipUps: (parsed.energyStats && parsed.energyStats.slipUps) || (parsed.relapses || 0)
+                };
+
+                // Preserve energyPrice (default 95)
+                if (typeof parsed.energyPrice === 'number' && parsed.energyPrice > 0) {
+                    merged.energyPrice = parsed.energyPrice;
+                } else {
+                    merged.energyPrice = 95;
+                }
+
+                // Merge Quests: preserve `done` statuses from v2.0 + custom quests
+                const oldQuestsMap = {};
+                const customQuests = [];
+                if (Array.isArray(parsed.quests)) {
+                    parsed.quests.forEach(oq => {
+                        oldQuestsMap[oq.id] = oq;
+                        if (oq.isCustom) customQuests.push(oq);
+                    });
+                }
+
+                // Map v2.0 quest IDs to v3.0 P5R IDs so ticked checkboxes stay ticked
+                const legacyIdMap = {
+                    'd_inf_code': 'd_info_code',
+                    'd_rus_test': 'd_rus',
+                    'd_sun_bot': 'd_sun_study',
+                    'd_video_edit': 'd_edit',
+                    'd_manga_trans': 'd_manga_tl',
+                    'd_diy_hw': 'd_diy_linux',
+                    'd_synergetic': 'd_hair_skin',
+                    'd_fit_edc': 'd_fit_prep',
+                    'd_cooking': 'd_cook',
+                    'd_game_limit': 'd_media_limit',
+                    'w_probnik_math': 'w_probnik_ege',
+                    'w_pc_clean': 'w_gen_clean',
+                    's_math_80': 's_palace_math',
+                    's_inf_85': 's_palace_inf',
+                    's_cd_player': 's_palace_cd',
+                    's_cybersec_uni': 's_palace_final'
+                };
+
+                merged.quests = getMasterQuests().map(mq => {
+                    const existing = oldQuestsMap[mq.id];
+                    let isDone = existing ? !!existing.done : false;
+                    Object.keys(legacyIdMap).forEach(oldId => {
+                        if (legacyIdMap[oldId] === mq.id && oldQuestsMap[oldId] && oldQuestsMap[oldId].done) {
+                            isDone = true;
+                        }
+                    });
+                    return { ...mq, done: isDone };
+                }).concat(customQuests);
+
+                // Merge Shop
+                const customShop = Array.isArray(parsed.shop)
+                    ? parsed.shop.filter(s => s.isCustom)
+                    : [];
+                merged.shop = getMasterShop().concat(customShop);
+
+                // Merge Media Queues
+                if (Array.isArray(parsed.mediaQueues) && parsed.mediaQueues.length === 4) {
+                    merged.mediaQueues = parsed.mediaQueues;
+                } else {
+                    merged.mediaQueues = getMasterMediaQueues();
+                }
+
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+                return merged;
+            } catch (e) {
+                console.error('Ошибка миграции сохранения:', e);
+                return getDefaultState();
+            }
+        }
+
+        function saveState() {
+            try {
+                state.cleanDays = state.energyStats.cleanDays || 0;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error('Ошибка сохранения:', e);
+            }
+        }
+
+        let state = loadState();
+        let activeMainTab = 'quests';
+        let activeQuestSubTab = 'daily';
+        let activeDailyCategory = 'all';
+        let activeShopSubTab = 'store';
+        let activeShopCategory = 'all';
+
+        // Web Audio API Synth (Persona 5 Menu & All-Out Attack Chimes)
+        let audioCtx = null;
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            try {
+                if (!audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+                if (type === 'complete') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(587.33, now);
+                    osc.frequency.setValueAtTime(783.99, now + 0.06);
+                    osc.frequency.setValueAtTime(1174.66, now + 0.12);
+                    gain.gain.setValueAtTime(0.11, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+                    osc.start(now);
+                    osc.stop(now + 0.26);
+                } else if (type === 'buy') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(659.25, now);
+                    osc.frequency.setValueAtTime(987.77, now + 0.07);
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'levelup') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(554.37, now + 0.07);
+                    osc.frequency.setValueAtTime(659.25, now + 0.14);
+                    osc.frequency.setValueAtTime(880, now + 0.21);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                    osc.start(now);
+                    osc.stop(now + 0.45);
+                } else if (type === 'undo') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.setValueAtTime(200, now + 0.08);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+                    osc.start(now);
+                    osc.stop(now + 0.18);
+                }
+            } catch (e) {}
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            saveState();
+            renderAll();
+            showToast(state.soundEnabled ? 'Звук меню P5 включен' : 'Звук отключен', 'info');
+        }
+
+        function getLevelInfo(xp) {
+            const level = Math.floor(xp / 200) + 1;
+            const currentLevelXp = xp % 200;
+            const neededXp = 200;
+            const percent = Math.min(100, Math.round((currentLevelXp / neededXp) * 100));
+
+            let rankTitle = RANKS[0].title;
+            for (const r of RANKS) {
+                if (level >= r.minLvl) rankTitle = r.title;
+            }
+            return { level, currentLevelXp, neededXp, percent, rankTitle };
+        }
+
+        function addLog(text, type = 'info') {
+            const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            state.logs.unshift({ time, text, type });
+            if (state.logs.length > 35) state.logs.pop();
+        }
+
+        function showToast(message, type = 'red') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            let bgClass = 'bg-p5-red text-white border-white';
+            let icon = 'fa-star text-p5-yellow';
+
+            if (type === 'yellow' || type === 'amber') {
+                bgClass = 'bg-p5-yellow text-black border-black';
+                icon = 'fa-coins text-p5-red';
+            } else if (type === 'info' || type === 'cyan') {
+                bgClass = 'bg-black text-white border-p5-yellow';
+                icon = 'fa-mask text-p5-red';
+            } else if (type === 'crimson') {
+                bgClass = 'bg-black text-p5-red border-p5-red';
+                icon = 'fa-triangle-exclamation text-p5-yellow';
+            }
+
+            toast.className = `px-3.5 py-2.5 border-2 shadow-[4px_4px_0_#000] p5-skew flex items-center gap-2.5 text-xs font-display uppercase tracking-wide animate-p5-pop ${bgClass}`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-sm shrink-0"></i><span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.2s ease';
+                setTimeout(() => toast.remove(), 200);
+            }, 2500);
+        }
+
+        // ==================== DAILY PHOTO CONTRACT & STEP TRACKER LOGIC ====================
+
+        function getTodayPhotoPrompt() {
+            const now = new Date();
+            const dayHash = now.getFullYear() * 400 + (now.getMonth() + 1) * 32 + now.getDate();
+            const idx = Math.abs(dayHash + (state.photoRerollOffset || 0)) % PHOTO_PROMPTS.length;
+            return PHOTO_PROMPTS[idx];
+        }
+
+        function rerollPhotoPrompt() {
+            state.photoRerollOffset = (state.photoRerollOffset || 0) + 1;
+            playSound('buy');
+            saveState();
+            renderSpecialWidgets();
+            showToast('Новая цель для фото-охоты выбрана!', 'info');
+        }
+
+        function completeDailyPhotoContract() {
+            const photoQuest = state.quests.find(q => q.id === 'd_photo_daily');
+            const promptObj = getTodayPhotoPrompt();
+            const noteInput = document.getElementById('photo-note-input');
+            const noteText = noteInput ? noteInput.value.trim() : '';
+
+            if (photoQuest && !photoQuest.done) {
+                toggleQuest('d_photo_daily');
+            } else {
+                playSound('complete');
+                showToast('Кадр дня уже засчитан сегодня!', 'yellow');
+            }
+
+            // Save to Photo History Log
+            const dateStr = new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+            state.photoHistory = state.photoHistory || [];
+            state.photoHistory.unshift({
+                date: dateStr,
+                prompt: promptObj.title,
+                note: noteText || 'Nikon D5100 / S21 FE'
+            });
+            if (state.photoHistory.length > 25) state.photoHistory.pop();
+            if (noteInput) noteInput.value = '';
+
+            saveState();
+            renderAll();
+        }
+
+        function addSteps(amount) {
+            state.stepsToday = Math.max(0, (state.stepsToday || 0) + amount);
+            checkStepQuestsAutoComplete();
+            playSound('buy');
+            saveState();
+            renderAll();
+        }
+
+        function openManualStepsModal() {
+            const current = state.stepsToday || 0;
+            showModal(`
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-display uppercase text-p5-yellow">ВВЕСТИ ШАГИ ЗА ДЕНЬ</h3>
+                        <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <p class="text-xs text-white/80">Введи текущее число шагов с телефона или часов (при 6 000 и 10 000 квесты закроются автоматически):</p>
+                    <input id="modal-steps-input" type="number" value="${current}" min="0" max="100000" class="w-full px-3 py-2.5 bg-black border-2 border-p5-yellow font-mono text-base font-black text-white focus:outline-none">
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="closeModal()" class="p5-cutout-btn py-2.5 bg-p5-dark text-white text-xs font-display uppercase">ОТМЕНА</button>
+                        <button onclick="saveManualSteps()" class="p5-cutout-btn py-2.5 bg-p5-red text-white text-xs font-display uppercase">СОХРАНИТЬ</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function saveManualSteps() {
+            const val = parseInt(document.getElementById('modal-steps-input').value, 10);
+            if (!isNaN(val) && val >= 0) {
+                state.stepsToday = val;
+                checkStepQuestsAutoComplete();
+                saveState();
+                closeModal();
+                renderAll();
+                showToast(`Шаги обновлены: ${val.toLocaleString('ru-RU')}`, 'yellow');
+            }
+        }
+
+        function resetStepsToday() {
+            state.stepsToday = 0;
+            saveState();
+            renderAll();
+            showToast('Счётчик шагов за день сброшен', 'info');
+        }
+
+        function checkStepQuestsAutoComplete() {
+            const steps = state.stepsToday || 0;
+            const q6k = state.quests.find(q => q.id === 'd_steps_6k');
+            const q10k = state.quests.find(q => q.id === 'd_steps_10k');
+
+            if (steps >= 6000 && q6k && !q6k.done) {
+                toggleQuest('d_steps_6k');
+            }
+            if (steps >= 10000 && q10k && !q10k.done) {
+                toggleQuest('d_steps_10k');
+            }
+        }
+
+        function renderSpecialWidgets() {
+            const widgetsBox = document.getElementById('daily-special-widgets');
+            if (!widgetsBox) return;
+
+            if (activeQuestSubTab !== 'daily') {
+                widgetsBox.classList.add('hidden');
+                return;
+            }
+            widgetsBox.classList.remove('hidden');
+
+            // 1. Render Photo Prompt
+            const promptObj = getTodayPhotoPrompt();
+            const photoQuest = state.quests.find(q => q.id === 'd_photo_daily');
+            const isPhotoDone = photoQuest && photoQuest.done;
+
+            document.getElementById('photo-prompt-title').textContent = promptObj.title;
+            document.getElementById('photo-prompt-tip').textContent = `Совет: ${promptObj.tip}`;
+
+            const photoBtn = document.getElementById('photo-complete-btn');
+            if (isPhotoDone) {
+                photoBtn.className = 'p5-cutout-btn bg-p5-yellow text-black px-3 py-1.5 text-xs font-display uppercase shrink-0';
+                photoBtn.innerHTML = '✔ КАДР СНЯТ';
+            } else {
+                photoBtn.className = 'p5-cutout-btn bg-p5-red text-white px-3 py-1.5 text-xs font-display uppercase shrink-0';
+                photoBtn.innerHTML = '📸 Снял! (+25)';
+            }
+
+            // 2. Render Step Tracker
+            const steps = state.stepsToday || 0;
+            const pct = Math.min(100, Math.round((steps / 10000) * 100));
+            document.getElementById('steps-current').textContent = steps.toLocaleString('ru-RU');
+            document.getElementById('steps-progress-bar').style.width = `${pct}%`;
+
+            const b6k = document.getElementById('steps-badge-6k');
+            const b10k = document.getElementById('steps-badge-10k');
+            b6k.innerHTML = steps >= 6000
+                ? `<span class="text-p5-yellow font-bold"><i class="fa-solid fa-circle-check mr-1"></i>6 000 ВЗЯТО!</span>`
+                : `<i class="fa-regular fa-circle mr-1"></i>6 000 (+20 PTS)`;
+            b10k.innerHTML = steps >= 10000
+                ? `<span class="text-p5-yellow font-bold"><i class="fa-solid fa-circle-check mr-1"></i>10 000 ВЗЯТО!</span>`
+                : `<i class="fa-regular fa-circle mr-1"></i>10 000 (+35 PTS)`;
+        }
+
+        // ==================== RENDER ALL ====================
+
+        function renderAll() {
+            renderHUD();
+            renderScheduleBanner();
+            renderSpecialWidgets();
+            renderQuests();
+            renderMediaQueues();
+            renderShop();
+            renderStatsAndLogs();
+            checkDateRolloverBanner();
+        }
+
+        function renderHUD() {
+            const now = new Date();
+            const mStr = String(now.getMonth() + 1).padStart(2, '0');
+            const dStr = String(now.getDate()).padStart(2, '0');
+            const dowShort = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][now.getDay()];
+
+            document.getElementById('hud-date-month').textContent = mStr;
+            document.getElementById('hud-date-day').textContent = dStr;
+            document.getElementById('hud-date-dow').textContent = dowShort;
+
+            const lvlInfo = getLevelInfo(state.xp);
+            document.getElementById('hud-level').textContent = lvlInfo.level;
+            document.getElementById('hud-rank').textContent = lvlInfo.rankTitle;
+            document.getElementById('hud-pts').textContent = state.pts;
+            document.getElementById('hud-streak').textContent = state.streak;
+            document.getElementById('hud-can-price').textContent = state.energyPrice || 95;
+
+            document.getElementById('hud-xp-current').textContent = lvlInfo.currentLevelXp;
+            document.getElementById('hud-xp-next').textContent = lvlInfo.neededXp;
+            document.getElementById('hud-xp-bar').style.width = `${lvlInfo.percent}%`;
+
+            // Daily Quota
+            const dailies = state.quests.filter(q => q.type === 'daily');
+            const doneDailies = dailies.filter(q => q.done).length;
+            const quotaEl = document.getElementById('hud-daily-quota');
+            quotaEl.textContent = `СТРИК-КВОТА: ${doneDailies}/3 (ВСЕГО ${dailies.length})`;
+            quotaEl.className = doneDailies >= 3
+                ? 'bg-p5-yellow text-black px-1.5 py-0.5 font-display text-[9px] uppercase p5-skew font-black'
+                : 'bg-p5-red text-white px-1.5 py-0.5 font-display text-[9px] uppercase p5-skew';
+
+            // Shield
+            const shieldEl = document.getElementById('hud-shield');
+            if (state.streakShield) {
+                shieldEl.classList.remove('hidden');
+                shieldEl.classList.add('flex');
+            } else {
+                shieldEl.classList.add('hidden');
+                shieldEl.classList.remove('flex');
+            }
+
+            // Sound icon
+            const soundIcon = document.getElementById('sound-icon');
+            soundIcon.className = state.soundEnabled ? 'fa-solid fa-volume-high text-p5-yellow' : 'fa-solid fa-volume-xmark text-white/40';
+
+            // Inventory badge
+            const invCount = state.inventory.length;
+            const invBadge = document.getElementById('inventory-badge');
+            const navDot = document.getElementById('nav-inv-dot');
+            if (invCount > 0) {
+                invBadge.textContent = invCount;
+                invBadge.classList.remove('hidden');
+                navDot.classList.remove('hidden');
+            } else {
+                invBadge.classList.add('hidden');
+                navDot.classList.add('hidden');
+            }
+        }
+
+        function renderScheduleBanner() {
+            const dayIdx = new Date().getDay();
+            const dayNames = ['ВОСКРЕСЕНЬЕ', 'ПОНЕДЕЛЬНИК', 'ВТОРНИК', 'СРЕДА', 'ЧЕТВЕРГ', 'ПЯТНИЦА', 'СУББОТА'];
+            const anchorsByDay = {
+                1: 'Школа 08:00–13:30 (дома в 14:00) • Бот ЕГЭ + Уборка + Шаги',
+                2: 'Школа 08:00–13:30 • ★ КОНФИДАНТ: Математика в 17:00',
+                3: 'Школа 08:00–13:30 (дома в 14:00) • Инфа + Кадр дня + DaVinci',
+                4: 'Школа 08:00–13:30 • ★ КОНФИДАНТ: Математика в 16:00',
+                5: 'Школа 08:00–13:30 • ★ КОНФИДАНТ: Русский в 17:00',
+                6: 'Суббота • Генеральная зачистка комнаты, железо и кенты',
+                0: '★ ВОСКРЕСНЫЙ СПЕЦ-БОТ ЕГЭ • Подготовка к новой неделе'
+            };
+
+            document.getElementById('sched-day-name').textContent = dayNames[dayIdx];
+            document.getElementById('sched-anchors').textContent = anchorsByDay[dayIdx];
+        }
+
+        function renderQuests() {
+            const listEl = document.getElementById('quests-list');
+            const todayDay = new Date().getDay();
+            const canPrice = state.energyPrice || 95;
+
+            const dCount = state.quests.filter(q => q.type === 'daily').length;
+            const wCount = state.quests.filter(q => q.type === 'weekly').length;
+            const sCount = state.quests.filter(q => q.type === 'story').length;
+            document.getElementById('qtab-daily').textContent = `ДЕЙЛИКИ (${dCount})`;
+            document.getElementById('qtab-weekly').textContent = `ВИКЛИКИ (${wCount})`;
+            document.getElementById('qtab-story').textContent = `ДВОРЦЫ (${sCount})`;
+
+            const dCatBar = document.getElementById('daily-category-bar');
+            const ctxBar = document.getElementById('quest-context-bar');
+            const ctxText = document.getElementById('quest-context-text');
+            const ctxAct = document.getElementById('quest-context-action');
+
+            if (activeQuestSubTab === 'daily') {
+                dCatBar.classList.remove('hidden');
+                ctxBar.classList.add('hidden');
+                ctxBar.classList.remove('flex');
+            } else {
+                dCatBar.classList.add('hidden');
+                ctxBar.classList.remove('hidden');
+                ctxBar.classList.add('flex');
+                if (activeQuestSubTab === 'weekly') {
+                    ctxText.innerHTML = `ЕЖЕНЕДЕЛЬНЫЕ ЗАЧИСТКИ МЕМЕНТОС: Пробники, Ген. уборка, 50к шагов и Фото-сет`;
+                    ctxAct.classList.remove('hidden');
+                } else {
+                    ctxText.innerHTML = `ДВОРЦЫ СЮЖЕТКИ: Главные цели 11 класса и хардверные артефакты`;
+                    ctxAct.classList.add('hidden');
+                }
+            }
+
+            let filtered = state.quests.filter(q => q.type === activeQuestSubTab);
+            if (activeQuestSubTab === 'daily' && activeDailyCategory !== 'all') {
+                filtered = filtered.filter(q => (q.category || 'ege') === activeDailyCategory);
+            }
+
+            // Sort: today's scheduled Confidant quests first, then incomplete before completed
+            filtered.sort((a, b) => {
+                const aToday = Array.isArray(a.days) && a.days.includes(todayDay) ? 1 : 0;
+                const bToday = Array.isArray(b.days) && b.days.includes(todayDay) ? 1 : 0;
+                if (a.done !== b.done) return a.done ? 1 : -1;
+                return bToday - aToday;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="p5-card p-6 text-center text-white/70 text-xs font-display uppercase">
+                        В этой рубрике пусто. Нажми «+ СВОЙ», чтобы добавить миссию!
+                    </div>`;
+                return;
+            }
+
+            const catLabels = {
+                ege: '📚 ЕГЭ / УЧЁБА',
+                clean: '🧹 УБОРКА / БЫТ',
+                steps: '👟 ШАГИ / ФОРМА',
+                tech: '📸 ФОТО / ПРОЕКТЫ',
+                glowup: '⚡ ГЛОУ-АП',
+                routine: '⚡ РЕЖИМ'
+            };
+
+            listEl.innerHTML = filtered.map(q => {
+                const isBoss = q.type === 'story';
+                const isScheduledToday = Array.isArray(q.days) && q.days.includes(todayDay);
+                const isEnergyQuest = !!q.isEnergyClean || q.id === 'd_no_energy';
+
+                const displayTitle = isEnergyQuest
+                    ? `Чистый день без энергоса (+${canPrice} ₽ в сейв)`
+                    : q.title;
+
+                let cardStyle = 'p5-card';
+                if (q.done) {
+                    cardStyle = 'p5-card opacity-55 border-white/40 shadow-none';
+                } else if (isScheduledToday) {
+                    cardStyle = 'p5-card-yellow';
+                } else if (isBoss) {
+                    cardStyle = 'p5-card border-p5-red';
+                }
+
+                return `
+                <div class="${cardStyle} p-3.5">
+                    <div class="p5-card-inner flex items-start justify-between gap-3">
+                        <!-- Left Check Button + Info -->
+                        <div class="flex items-start gap-3 min-w-0 flex-1">
+                            <button onclick="toggleQuest('${q.id}')" class="p5-cutout-btn mt-0.5 w-7 h-7 flex items-center justify-center shrink-0 ${
+                                q.done 
+                                    ? 'bg-p5-yellow text-black border-black' 
+                                    : 'bg-black text-transparent hover:border-p5-yellow'
+                            }">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </button>
+
+                            <div class="min-w-0 flex-1 cursor-pointer" onclick="toggleQuest('${q.id}')">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="text-[10px] font-display uppercase px-1.5 py-0.5 bg-p5-red text-white border border-white">
+                                        +1 ${q.stat}
+                                    </span>
+                                    ${q.category && catLabels[q.category] ? `<span class="text-[10px] font-display uppercase px-1.5 py-0.5 bg-black text-white/80 border border-white/30">${catLabels[q.category]}</span>` : ''}
+                                    ${isScheduledToday ? `<span class="text-[10px] font-display uppercase px-1.5 py-0.5 bg-p5-yellow text-black font-black">★ СЕГОДНЯ ПО ПЛАНУ</span>` : ''}
+                                    ${isBoss ? `<span class="text-[10px] font-display uppercase px-1.5 py-0.5 bg-white text-black font-black">👑 СОКРОВИЩЕ ДВОРЦА</span>` : ''}
+                                    ${isEnergyQuest ? `<span class="text-[10px] font-mono font-bold px-1.5 py-0.5 bg-black text-p5-yellow border border-p5-yellow">+${canPrice} ₽ В СЕЙВ</span>` : ''}
+                                </div>
+                                <h4 class="text-sm font-extrabold mt-1.5 leading-snug ${q.done ? 'line-through text-white/50' : 'text-white'}">${escapeHtml(displayTitle)}</h4>
+                                <p class="text-xs text-white/75 mt-0.5 leading-relaxed">${escapeHtml(q.desc)}</p>
+                            </div>
+                        </div>
+
+                        <!-- Right PTS Cutout & Delete Custom -->
+                        <div class="flex flex-col items-end gap-2 shrink-0">
+                            <div class="p5-yellow-badge px-2 py-1 font-mono text-xs font-black whitespace-nowrap">
+                                +${q.pts} <span class="text-[9px] font-display">PTS</span>
+                            </div>
+                            ${q.isCustom ? `
+                                <button onclick="deleteCustomQuest('${q.id}')" class="text-white/50 hover:text-p5-red text-xs px-1" title="Удалить">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ==================== RENDER SEQUENTIAL MEDIA QUEUES ====================
+
+        function renderMediaQueues() {
+            const container = document.getElementById('media-queues-container');
+            if (!container) return;
+
+            container.innerHTML = state.mediaQueues.map(mq => {
+                const activeIdx = mq.currentIndex || 0;
+                const allDone = activeIdx >= mq.items.length;
+                const currentItem = !allDone ? mq.items[activeIdx] : null;
+
+                return `
+                <div class="p5-card p-4">
+                    <div class="p5-card-inner space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 bg-p5-red text-white border-2 border-white flex items-center justify-center shrink-0">
+                                    <i class="fa-solid ${mq.icon}"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-display uppercase text-white tracking-wide">${escapeHtml(mq.title)}</h3>
+                                    <p class="text-[11px] text-white/75">${escapeHtml(mq.subtitle)}</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-mono px-2 py-0.5 bg-black border border-white text-p5-yellow shrink-0">
+                                ${Math.min(activeIdx + 1, mq.items.length)} / ${mq.items.length}
+                            </span>
+                        </div>
+
+                        ${!allDone ? `
+                            <div class="p-3 bg-black border-2 border-p5-yellow space-y-2.5">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="text-[10px] font-display uppercase px-1.5 py-0.5 bg-p5-red text-white">
+                                        ▶ СЕЙЧАС В РОТАЦИИ
+                                    </span>
+                                    <span class="text-[11px] font-mono text-p5-yellow">
+                                        Порций закрыто: <strong>${currentItem.chunks || 0}</strong>
+                                    </span>
+                                </div>
+                                <div class="text-sm font-extrabold text-white">${escapeHtml(currentItem.title)}</div>
+                                <div class="grid grid-cols-2 gap-2 pt-0.5">
+                                    <button onclick="logMediaChunk('${mq.id}')" class="p5-cutout-btn py-2 px-2 bg-p5-dark hover:bg-p5-red text-white font-display uppercase text-[11px] flex items-center justify-center gap-1">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>${escapeHtml(mq.unitLabel)}</span>
+                                    </button>
+                                    <button onclick="completeMediaTitle('${mq.id}')" class="p5-cutout-btn py-2 px-2 bg-p5-yellow text-black font-display uppercase text-[11px] flex items-center justify-center gap-1">
+                                        <i class="fa-solid fa-flag-checkered"></i>
+                                        <span>ЗАКРЫТ (+100)</span>
+                                    </button>
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="p-3 bg-p5-red text-white border-2 border-white text-center space-y-2">
+                                <div class="text-xs font-display uppercase">★ ВСЯ ОЧЕРЕДЬ ЗАКРЫТА!</div>
+                                <button onclick="resetMediaQueue('${mq.id}')" class="p5-cutout-btn px-3 py-1 bg-black text-white text-[10px] font-display uppercase">
+                                    СБРОСИТЬ В НАЧАЛО
+                                </button>
+                            </div>
+                        `}
+
+                        <div class="space-y-1 pt-1">
+                            ${mq.items.map((item, idx) => {
+                                const isCurrent = idx === activeIdx;
+                                const isPast = idx < activeIdx || item.done;
+                                return `
+                                <div onclick="setMediaPointer('${mq.id}', ${idx})" class="px-2.5 py-1.5 flex items-center justify-between gap-2 text-xs cursor-pointer transition-all ${
+                                    isCurrent
+                                        ? 'bg-p5-red text-white font-bold border border-white'
+                                        : isPast
+                                            ? 'text-white/40 line-through hover:bg-white/5'
+                                            : 'text-white/75 hover:bg-white/5'
+                                }">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="font-mono text-[10px] w-4 text-center ${isCurrent ? 'text-p5-yellow font-black' : 'text-white/50'}">${idx + 1}.</span>
+                                        <span class="truncate">${escapeHtml(item.title)}</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        ${item.chunks > 0 ? `<span class="text-[10px] font-mono text-p5-yellow">${item.chunks} сес.</span>` : ''}
+                                        ${isPast ? `<i class="fa-solid fa-check text-p5-yellow text-[10px]"></i>` : isCurrent ? `<span class="text-[9px] font-display uppercase text-p5-yellow">АКТИВЕН</span>` : `<span class="text-[9px] font-mono text-white/40">ОЧЕРЕДЬ</span>`}
+                                    </div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function logMediaChunk(queueId) {
+            const mq = state.mediaQueues.find(q => q.id === queueId);
+            if (!mq) return;
+            const item = mq.items[mq.currentIndex];
+            if (!item) return;
+
+            item.chunks = (item.chunks || 0) + 1;
+            state.xp += 15;
+            state.pts += 15;
+            state.stats.DISC = (state.stats.DISC || 0) + 1;
+
+            playSound('complete');
+            addLog(`Медиа-порция: ${item.title} (+15 PTS)`, 'quest');
+            saveState();
+            renderAll();
+            showToast(`+1 порция «${item.title}» (+15 PTS)!`, 'red');
+        }
+
+        function completeMediaTitle(queueId) {
+            const mq = state.mediaQueues.find(q => q.id === queueId);
+            if (!mq) return;
+            const item = mq.items[mq.currentIndex];
+            if (!item) return;
+
+            item.done = true;
+            state.xp += 100;
+            state.pts += 100;
+            state.questsCompletedCount = (state.questsCompletedCount || 0) + 1;
+            mq.currentIndex = Math.min(mq.items.length, mq.currentIndex + 1);
+
+            const nextItem = mq.items[mq.currentIndex];
+            playSound('levelup');
+            addLog(`Тайтл закрыт: ${item.title} (+100 PTS)`, 'quest');
+            saveState();
+            renderAll();
+            showToast(
+                nextItem
+                    ? `Тайтл закрыт (+100 PTS)! Далее: ${nextItem.title}`
+                    : `Тайтл закрыт (+100 PTS)! Очередь пройдена!`,
+                'yellow'
+            );
+        }
+
+        function setMediaPointer(queueId, idx) {
+            const mq = state.mediaQueues.find(q => q.id === queueId);
+            if (!mq || idx < 0 || idx >= mq.items.length) return;
+            mq.currentIndex = idx;
+            saveState();
+            renderMediaQueues();
+            showToast(`Активный тайтл: ${mq.items[idx].title}`, 'info');
+        }
+
+        function resetMediaQueue(queueId) {
+            const mq = state.mediaQueues.find(q => q.id === queueId);
+            if (!mq) return;
+            mq.currentIndex = 0;
+            mq.items.forEach(i => { i.done = false; });
+            saveState();
+            renderMediaQueues();
+        }
+
+        // ==================== SHOP & INVENTORY RENDER ====================
+
+        function renderShop() {
+            const storeList = document.getElementById('shop-items-list');
+            const canPrice = state.energyPrice || 95;
+            const filteredShop = activeShopCategory === 'all'
+                ? state.shop
+                : state.shop.filter(item => item.category === activeShopCategory);
+
+            storeList.innerHTML = filteredShop.map(item => {
+                const canAfford = state.pts >= item.cost;
+                let catBadge = '⚡ ТОНИК';
+                if (item.category === 'chill') catBadge = '🎮 ДОСУГ';
+                else if (item.category === 'epic') catBadge = '💎 СОКРОВИЩЕ';
+
+                const displayTitle = item.id === 'shop_energy_1'
+                    ? `Лицензия на банку (${canPrice} ₽ / Takemi Buff)`
+                    : item.title;
+                const displayDesc = item.id === 'shop_energy_1'
+                    ? `Легально взять банку энергоса за ${canPrice} ₽ без чувства вины`
+                    : item.desc;
+
+                return `
+                <div class="p5-card p-3.5">
+                    <div class="p5-card-inner flex items-center justify-between gap-3">
+                        <div class="flex items-start gap-3 min-w-0 flex-1">
+                            <div class="w-10 h-10 bg-p5-red text-white border-2 border-white flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fa-solid ${item.icon || 'fa-gift'} text-base"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[9px] font-display uppercase px-1.5 py-0.5 bg-black text-p5-yellow border border-p5-yellow">${catBadge}</span>
+                                    ${item.isCustom ? `
+                                        <button onclick="deleteCustomReward('${item.id}')" class="text-white/50 hover:text-p5-red text-[11px]" title="Удалить">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                                <h4 class="text-sm font-extrabold text-white mt-1 leading-snug">${escapeHtml(displayTitle)}</h4>
+                                <p class="text-xs text-white/75 mt-0.5 leading-relaxed">${escapeHtml(displayDesc)}</p>
+                            </div>
+                        </div>
+
+                        <button onclick="buyReward('${item.id}')" class="p5-cutout-btn px-3 py-2 font-mono text-xs font-black shrink-0 ${
+                            canAfford 
+                                ? 'bg-p5-yellow text-black border-black' 
+                                : 'bg-black text-white/40 border-white/30 opacity-60'
+                        }">
+                            <div>${item.cost}</div>
+                            <div class="text-[9px] font-display uppercase">PTS</div>
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            const invList = document.getElementById('inventory-items-list');
+            if (state.inventory.length === 0) {
+                invList.innerHTML = `
+                    <div class="p5-card p-8 text-center space-y-2">
+                        <div class="p5-card-inner">
+                            <i class="fa-solid fa-box-open text-2xl text-p5-red"></i>
+                            <div class="text-xs font-display uppercase text-white mt-2">ИНВЕНТАРЬ ПУСТ</div>
+                            <div class="text-[11px] text-white/60 mt-1">Закрывай дейлики и закупайся трофеями на Чёрном Рынке.</div>
+                        </div>
+                    </div>`;
+            } else {
+                invList.innerHTML = state.inventory.map(coupon => `
+                    <div class="p5-card-yellow p-3.5">
+                        <div class="p5-card-inner flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 bg-p5-red text-white border-2 border-white flex items-center justify-center shrink-0">
+                                    <i class="fa-solid ${coupon.icon || 'fa-ticket'}"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-[10px] font-display uppercase text-p5-yellow">КУПОН ГОТОВ // ${coupon.boughtAt}</div>
+                                    <h4 class="text-sm font-extrabold text-white truncate">${escapeHtml(coupon.title)}</h4>
+                                    <p class="text-xs text-white/75 truncate">${escapeHtml(coupon.desc)}</p>
+                                </div>
+                            </div>
+                            <button onclick="useInventoryCoupon('${coupon.uid}')" class="p5-cutout-btn px-3 py-2 bg-p5-red text-white font-display uppercase text-xs shrink-0">
+                                АКТИВИРОВАТЬ
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderStatsAndLogs() {
+            const lvlInfo = getLevelInfo(state.xp);
+            document.getElementById('profile-rank-subtitle').textContent = `Ранг: ${lvlInfo.rankTitle} (LV. ${lvlInfo.level})`;
+            document.getElementById('profile-total-xp').textContent = `${state.xp} XP`;
+            document.getElementById('profile-quests-done').textContent = state.questsCompletedCount || 0;
+            document.getElementById('profile-sound-status').textContent = state.soundEnabled ? 'ВКЛ' : 'ВЫКЛ';
+
+            // Render 4 Social Stats
+            const grid = document.getElementById('stats-cards-grid');
+            grid.innerHTML = Object.keys(STAT_META).map(key => {
+                const val = state.stats[key] || 0;
+                const meta = STAT_META[key];
+                const statLvl = Math.floor(val / 10) + 1;
+                const progress = (val % 10) * 10;
+
+                return `
+                <div class="p5-card p-3.5">
+                    <div class="p5-card-inner space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="w-7 h-7 bg-p5-red text-white border border-white flex items-center justify-center text-xs">
+                                <i class="fa-solid ${meta.icon}"></i>
+                            </span>
+                            <span class="font-display text-xs text-p5-yellow">RANK ${statLvl} <span class="text-white/60 font-mono text-[10px]">(${val})</span></span>
+                        </div>
+                        <div>
+                            <div class="text-xs font-display uppercase text-white">${meta.name}</div>
+                            <div class="text-[10px] text-white/70 truncate">${meta.desc}</div>
+                        </div>
+                        <div class="w-full h-2 bg-black border border-white overflow-hidden">
+                            <div class="h-full bg-p5-yellow transition-all duration-300" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Energy Drink Tracker
+            const cleanDays = state.energyStats.cleanDays || 0;
+            const canPrice = state.energyPrice || 95;
+            const savedRub = cleanDays * canPrice;
+            document.getElementById('can-price-label').textContent = canPrice;
+            document.getElementById('energy-clean-days').textContent = cleanDays;
+            document.getElementById('energy-saved-rub').textContent = `${savedRub} ₽`;
+            document.getElementById('energy-licensed-used').textContent = `${state.energyStats.licensedUsed || 0} шт`;
+
+            // Photo Hunt History
+            const photoList = document.getElementById('photo-history-list');
+            const photoCount = document.getElementById('photo-log-count');
+            const photos = state.photoHistory || [];
+            photoCount.textContent = `${photos.length} кадров`;
+            if (photos.length === 0) {
+                photoList.innerHTML = `<div class="text-xs text-white/50 font-mono">Пока нет записанных кадров. Закрой «Кадр дня» во вкладке Миссии!</div>`;
+            } else {
+                photoList.innerHTML = photos.map(p => `
+                    <div class="px-2.5 py-1.5 bg-black border-l-4 border-p5-yellow text-xs flex items-center justify-between gap-2">
+                        <div class="truncate">
+                            <span class="font-mono text-[10px] text-p5-yellow mr-1">[${escapeHtml(p.date)}]</span>
+                            <span class="font-bold text-white">${escapeHtml(p.prompt)}</span>
+                        </div>
+                        <span class="text-[10px] font-mono text-white/60 shrink-0">${escapeHtml(p.note)}</span>
+                    </div>
+                `).join('');
+            }
+
+            // Activity Log
+            const logEl = document.getElementById('activity-log-list');
+            logEl.innerHTML = state.logs.map(l => {
+                let dotColor = 'bg-white';
+                if (l.type === 'quest') dotColor = 'bg-p5-red';
+                if (l.type === 'shop') dotColor = 'bg-p5-yellow';
+
+                return `
+                <div class="px-3 py-2 bg-p5-dark border border-white/30 flex items-center gap-2.5 text-xs">
+                    <span class="w-2 h-2 ${dotColor} shrink-0"></span>
+                    <span class="font-mono text-[10px] text-p5-yellow shrink-0">${l.time}</span>
+                    <span class="text-white truncate">${escapeHtml(l.text)}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // ==================== CORE QUEST & SHOP ACTIONS ====================
+
+        function toggleQuest(questId) {
+            const q = state.quests.find(item => item.id === questId);
+            if (!q) return;
+
+            const prevLvl = getLevelInfo(state.xp).level;
+            const isEnergyQuest = !!q.isEnergyClean || q.id === 'd_no_energy';
+            const canPrice = state.energyPrice || 95;
+
+            if (!q.done) {
+                q.done = true;
+                state.xp += q.pts;
+                state.pts += q.pts;
+                state.stats[q.stat] = (state.stats[q.stat] || 0) + 1;
+                state.questsCompletedCount = (state.questsCompletedCount || 0) + 1;
+
+                if (isEnergyQuest) {
+                    state.energyStats.cleanDays = (state.energyStats.cleanDays || 0) + 1;
+                    state.cleanDays = state.energyStats.cleanDays;
+                }
+
+                const newLvl = getLevelInfo(state.xp).level;
+                if (newLvl > prevLvl) {
+                    playSound('levelup');
+                    showToast(`LEVEL UP! УРОВЕНЬ ${newLvl}! (+${q.pts} PTS)`, 'yellow');
+                    addLog(`LEVEL UP: Уровень ${newLvl}!`, 'quest');
+                } else {
+                    playSound('complete');
+                    showToast(
+                        isEnergyQuest
+                            ? `Чистый день! +${q.pts} PTS и +${canPrice} ₽ в сейв!`
+                            : `Миссия закрыта: +${q.pts} PTS и +1 ${q.stat}`,
+                        'red'
+                    );
+                }
+                addLog(`Выполнено: ${q.title} (+${q.pts} PTS)`, 'quest');
+            } else {
+                q.done = false;
+                state.xp = Math.max(0, state.xp - q.pts);
+                state.pts = Math.max(0, state.pts - q.pts);
+                state.stats[q.stat] = Math.max(0, (state.stats[q.stat] || 1) - 1);
+                state.questsCompletedCount = Math.max(0, (state.questsCompletedCount || 1) - 1);
+
+                if (isEnergyQuest) {
+                    state.energyStats.cleanDays = Math.max(0, (state.energyStats.cleanDays || 1) - 1);
+                    state.cleanDays = state.energyStats.cleanDays;
+                }
+
+                playSound('undo');
+                showToast(`Отменено: ${q.title} (-${q.pts} PTS)`, 'info');
+                addLog(`Отмена: ${q.title}`, 'info');
+            }
+
+            saveState();
+            renderAll();
+        }
+
+        function openEditCanPriceModal() {
+            const current = state.energyPrice || 95;
+            showModal(`
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-display uppercase text-p5-yellow">ЦЕНА БАНКИ ЭНЕРГОСА (₽)</h3>
+                        <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <p class="text-xs text-white/80">Укажи свою цену за банку (по умолчанию 95 ₽). Вся сэкономленная сумма сразу пересчитается.</p>
+                    <input id="modal-can-price-input" type="number" value="${current}" min="30" max="500" class="w-full px-3 py-2.5 bg-black border-2 border-p5-yellow font-mono text-base font-black text-p5-yellow focus:outline-none">
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="closeModal()" class="p5-cutout-btn py-2.5 bg-p5-dark text-white text-xs font-display uppercase">ОТМЕНА</button>
+                        <button onclick="saveEditedCanPrice()" class="p5-cutout-btn py-2.5 bg-p5-red text-white text-xs font-display uppercase">СОХРАНИТЬ</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function saveEditedCanPrice() {
+            const val = parseInt(document.getElementById('modal-can-price-input').value, 10);
+            if (!isNaN(val) && val >= 20) {
+                state.energyPrice = val;
+                state.energyPriceUserSet = true;
+                saveState();
+                closeModal();
+                renderAll();
+                showToast(`Цена банки: ${val} ₽`, 'yellow');
+            }
+        }
+
+        function triggerEnergySlipUp() {
+            showModal(`
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-display uppercase text-p5-red">СРЫВ: БАНКА БЕЗ ЛИЦЕНЗИИ?</h3>
+                        <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <p class="text-xs text-white/85">Если купил энергос без купона из Чёрного Рынка: спишется <strong>40 PTS</strong> штрафа.</p>
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="closeModal()" class="p5-cutout-btn py-2.5 bg-p5-dark text-white text-xs font-display uppercase">ОТМЕНА</button>
+                        <button onclick="confirmEnergySlipUp()" class="p5-cutout-btn py-2.5 bg-p5-red text-white text-xs font-display uppercase">ШТРАФ -40 PTS</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function confirmEnergySlipUp() {
+            state.pts = Math.max(0, state.pts - 40);
+            state.energyStats.slipUps = (state.energyStats.slipUps || 0) + 1;
+            const cleanQuest = state.quests.find(q => q.id === 'd_no_energy');
+            if (cleanQuest && cleanQuest.done) {
+                cleanQuest.done = false;
+                state.energyStats.cleanDays = Math.max(0, (state.energyStats.cleanDays || 1) - 1);
+            }
+            playSound('undo');
+            addLog(`Срыв: энергос без лицензии (-40 PTS)`, 'info');
+            saveState();
+            closeModal();
+            renderAll();
+            showToast('Штраф -40 PTS. Бери только по лицензии!', 'crimson');
+        }
+
+        function buyReward(itemId) {
+            const item = state.shop.find(r => r.id === itemId);
+            if (!item) return;
+
+            if (state.pts < item.cost) {
+                showToast(`Не хватает ${item.cost - state.pts} PTS!`, 'crimson');
+                return;
+            }
+
+            state.pts -= item.cost;
+            const coupon = {
+                uid: 'cp_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                itemId: item.id,
+                title: item.title,
+                desc: item.desc,
+                icon: item.icon,
+                isEnergyCoupon: !!item.isEnergyCoupon,
+                isShieldCoupon: !!item.isShieldCoupon,
+                boughtAt: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })
+            };
+
+            state.inventory.unshift(coupon);
+            playSound('buy');
+            addLog(`Куплено: ${item.title} (-${item.cost} PTS)`, 'shop');
+            saveState();
+            renderAll();
+            showToast(`Куплено в инвентарь: «${item.title}»!`, 'yellow');
+        }
+
+        function useInventoryCoupon(uid) {
+            const idx = state.inventory.findIndex(c => c.uid === uid);
+            if (idx === -1) return;
+
+            const coupon = state.inventory[idx];
+            state.inventory.splice(idx, 1);
+
+            if (coupon.isEnergyCoupon) {
+                state.energyStats.licensedUsed = (state.energyStats.licensedUsed || 0) + 1;
+            }
+            if (coupon.isShieldCoupon) {
+                state.streakShield = true;
+            }
+
+            playSound('complete');
+            addLog(`Активирован купон: ${coupon.title}`, 'use');
+            saveState();
+            renderAll();
+            showToast(`Купон «${coupon.title}» активирован!`, 'yellow');
+        }
+
+        // ==================== DAY ROLLOVER & STREAK LOGIC ====================
+
+        function checkDateRolloverBanner() {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const banner = document.getElementById('new-day-banner');
+            if (state.lastActiveDate && state.lastActiveDate !== todayStr) {
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        function openEndDayModal() {
+            const dailies = state.quests.filter(q => q.type === 'daily');
+            const doneCount = dailies.filter(q => q.done).length;
+
+            let statusHtml = '';
+            if (doneCount >= 3) {
+                statusHtml = `
+                    <div class="p-3 bg-black border-2 border-p5-yellow text-p5-yellow text-xs">
+                        🔥 <strong>ОТЛИЧНЫЙ ЗАБЕГ!</strong> Закрыто ${doneCount} из ${dailies.length} дейликов. Стрик вырастет до <strong>${state.streak + 1} дн.</strong> (+1 к Воле).
+                    </div>`;
+            } else if (state.streakShield) {
+                statusHtml = `
+                    <div class="p-3 bg-black border-2 border-white text-white text-xs">
+                        🛡️ Закрыто ${doneCount}/3 дейликов, но <strong>Щит Стрика</strong> спасёт твою серию (${state.streak} дн.)!
+                    </div>`;
+            } else {
+                statusHtml = `
+                    <div class="p-3 bg-black border-2 border-p5-red text-p5-red text-xs">
+                        ⚠️ Закрыто только ${doneCount} из 3 нужных дейликов. Текущий стрик (${state.streak} дн.) сбросится в 0.
+                    </div>`;
+            }
+
+            showModal(`
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-display uppercase text-white">ЗАВЕРШИТЬ ТЕКУЩИЙ ДЕНЬ?</h3>
+                        <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <p class="text-xs text-white/80">Галочки дейликов и дневной счётчик шагов обнулятся для нового дня, а все очки PTS и сейв останутся.</p>
+                    ${statusHtml}
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="closeModal()" class="p5-cutout-btn py-2.5 bg-p5-dark text-white text-xs font-display uppercase">ОТМЕНА</button>
+                        <button onclick="confirmEndDay()" class="p5-cutout-btn py-2.5 bg-p5-red text-white text-xs font-display uppercase">НОВЫЙ ДЕНЬ</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function confirmEndDay() {
+            const dailies = state.quests.filter(q => q.type === 'daily');
+            const doneCount = dailies.filter(q => q.done).length;
+
+            if (doneCount >= 3) {
+                state.streak += 1;
+                state.stats.DISC = (state.stats.DISC || 0) + 1;
+                addLog(`День закрыт (${doneCount} миссий). Стрик: ${state.streak} дн.`, 'quest');
+                showToast(`Новый день! Стрик: ${state.streak} 🔥`, 'yellow');
+            } else if (state.streakShield) {
+                state.streakShield = false;
+                addLog(`Щит Стрика спас серию (${state.streak} дн.)!`, 'use');
+                showToast(`Щит спас твой стрик (${state.streak} дн.)!`, 'info');
+            } else {
+                state.streak = 0;
+                addLog(`День завершен (${doneCount}/3). Стрик сброшен.`, 'info');
+                showToast(`Начат новый день. Стрик обнулён.`, 'info');
+            }
+
+            state.quests.forEach(q => {
+                if (q.type === 'daily') q.done = false;
+            });
+            state.stepsToday = 0;
+            state.photoRerollOffset = 0;
+
+            state.lastActiveDate = new Date().toISOString().slice(0, 10);
+            playSound('complete');
+            saveState();
+            closeModal();
+            renderAll();
+        }
+
+        function resetWeekliesPrompt() {
+            showModal(`
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-display uppercase text-white">СБРОСИТЬ ВИКЛИКИ?</h3>
+                        <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <p class="text-xs text-white/80">Все галочки еженедельных миссий будут очищены для новой недели.</p>
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="closeModal()" class="p5-cutout-btn py-2.5 bg-p5-dark text-white text-xs font-display uppercase">ОТМЕНА</button>
+                        <button onclick="confirmResetWeeklies()" class="p5-cutout-btn py-2.5 bg-p5-red text-white text-xs font-display uppercase">СБРОСИТЬ</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function confirmResetWeeklies() {
+            state.quests.forEach(q => {
+                if (q.type === 'weekly') q.done = false;
+            });
+            addLog('Еженедельные миссии обновлены на новую неделю.', 'info');
+            saveState();
+            closeModal();
+            renderAll();
+            showToast('Виклики готовы к новой неделе!', 'yellow');
+        }
+
+        // ==================== CUSTOM QUESTS & REWARDS ====================
+
+        function openAddQuestModal() {
+            showModal(`
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-display uppercase text-p5-yellow">+ НОВАЯ МИССИЯ</h3>
+                        <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="space-y-2.5">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] font-display uppercase text-white/70">ТИП</label>
+                                <select id="nq-type" class="w-full mt-1 px-2.5 py-2 bg-black border-2 border-white text-xs text-white">
+                                    <option value="daily" ${activeQuestSubTab === 'daily' ? 'selected' : ''}>Дейлик</option>
+                                    <option value="weekly" ${activeQuestSubTab === 'weekly' ? 'selected' : ''}>Виклик</option>
+                                    <option value="story" ${activeQuestSubTab === 'story' ? 'selected' : ''}>Дворец / Босс</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-display uppercase text-white/70">РУБРИКА</label>
+                                <select id="nq-cat" class="w-full mt-1 px-2.5 py-2 bg-black border-2 border-white text-xs text-white">
+                                    <option value="ege">ЕГЭ / Учёба</option>
+                                    <option value="clean">Уборка / Быт</option>
+                                    <option value="steps">Шаги / Форма</option>
+                                    <option value="tech">Фото / Проекты</option>
+                                    <option value="glowup">Глоу-ап / Режим</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-display uppercase text-white/70">НАЗВАНИЕ МИССИИ</label>
+                            <input id="nq-title" type="text" placeholder="Напр.: Протереть оптику Nikon D5100" class="w-full mt-1 px-3 py-2 bg-black border-2 border-white text-xs text-white focus:outline-none focus:border-p5-yellow">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-display uppercase text-white/70">ДЕТАЛИ</label>
+                            <input id="nq-desc" type="text" placeholder="Условие выполнения" class="w-full mt-1 px-3 py-2 bg-black border-2 border-white text-xs text-white focus:outline-none focus:border-p5-yellow">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] font-display uppercase text-white/70">НАГРАДА (PTS)</label>
+                                <input id="nq-pts" type="number" value="25" min="5" max="2000" class="w-full mt-1 px-3 py-2 bg-black border-2 border-p5-yellow font-mono text-xs text-p5-yellow">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-display uppercase text-white/70">СТАТ</label>
+                                <select id="nq-stat" class="w-full mt-1 px-3 py-2 bg-black border-2 border-white text-xs text-white">
+                                    <option value="INT">INT (Знания)</option>
+                                    <option value="TECH">TECH (Мастерство)</option>
+                                    <option value="VIT">VIT (Тонус)</option>
+                                    <option value="DISC">DISC (Воля)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="closeModal()" class="p5-cutout-btn py-2.5 bg-p5-dark text-white text-xs font-display uppercase">ОТМЕНА</button>
+                        <button onclick="saveCustomQuest()" class="p5-cutout-btn py-2.5 bg-p5-red text-white text-xs font-display uppercase">ДОБАВИТЬ</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function saveCustomQuest() {
+            const type = document.getElementById('nq-type').value;
+            const category = document.getElementById('nq-cat').value;
+            const title = document.getElementById('nq-title').value.trim();
+            const desc = document.getElementById('nq-desc').value.trim() || 'Личный контракт Фантома';
+            const pts = Math.max(5, parseInt(document.getElementById('nq-pts').value, 10) || 25);
+            const stat = document.getElementById('nq-stat').value;
+
+            if (!title) {
+                showToast('Введи название миссии!', 'crimson');
+                return;
+            }
+
+            state.quests.push({
+                id: 'cq_' + Date.now(),
+                type,
+                category,
+                title,
+                desc,
+                pts,
+                stat,
+                done: false,
+                isCustom: true
+            });
+
+            activeQuestSubTab = type;
+            saveState();
+            closeModal();
+            switchQuestSubTab(type);
+            showToast('Своя миссия добавлена!', 'yellow');
+        }
+
+        function deleteCustomQuest(id) {
+            state.quests = state.quests.filter(q => q.id !== id);
+            saveState();
+            renderAll();
+            showToast('Миссия удалена', 'info');
+        }
+
+        function openAddRewardModal() {
+            showModal(`
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-display uppercase text-p5-yellow">+ СВОЙ ЛОТ В МАГАЗИН</h3>
+                        <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="space-y-2.5">
+                        <div>
+                            <label class="text-[10px] font-display uppercase text-white/70">КАТЕГОРИЯ</label>
+                            <select id="nr-cat" class="w-full mt-1 px-3 py-2 bg-black border-2 border-white text-xs text-white">
+                                <option value="boost">⚡ Тоники и Энергосы</option>
+                                <option value="chill">🎮 Досуг и Стритфуд</option>
+                                <option value="epic">💎 Сокровища</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-display uppercase text-white/70">НАЗВАНИЕ НАГРАДЫ</label>
+                            <input id="nr-title" type="text" placeholder="Напр.: Заказать шаурму / ремешок для камеры" class="w-full mt-1 px-3 py-2 bg-black border-2 border-white text-xs text-white focus:outline-none focus:border-p5-yellow">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-display uppercase text-white/70">ОПИСАНИЕ</label>
+                            <input id="nr-desc" type="text" placeholder="Заслуженный подгон" class="w-full mt-1 px-3 py-2 bg-black border-2 border-white text-xs text-white focus:outline-none focus:border-p5-yellow">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-display uppercase text-white/70">СТОИМОСТЬ (PTS)</label>
+                            <input id="nr-cost" type="number" value="120" min="10" max="10000" class="w-full mt-1 px-3 py-2 bg-black border-2 border-p5-yellow font-mono text-xs text-p5-yellow">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="closeModal()" class="p5-cutout-btn py-2.5 bg-p5-dark text-white text-xs font-display uppercase">ОТМЕНА</button>
+                        <button onclick="saveCustomReward()" class="p5-cutout-btn py-2.5 bg-p5-yellow text-black text-xs font-display uppercase">В МАГАЗИН</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function saveCustomReward() {
+            const category = document.getElementById('nr-cat').value;
+            const title = document.getElementById('nr-title').value.trim();
+            const desc = document.getElementById('nr-desc').value.trim() || 'Личная награда';
+            const cost = Math.max(10, parseInt(document.getElementById('nr-cost').value, 10) || 100);
+
+            if (!title) {
+                showToast('Введи название награды!', 'crimson');
+                return;
+            }
+
+            state.shop.push({
+                id: 'cr_' + Date.now(),
+                category,
+                title,
+                desc,
+                cost,
+                icon: 'fa-star',
+                isCustom: true
+            });
+
+            saveState();
+            closeModal();
+            renderAll();
+            showToast('Лот выставлен на Чёрный Рынок!', 'yellow');
+        }
+
+        function deleteCustomReward(id) {
+            state.shop = state.shop.filter(r => r.id !== id);
+            saveState();
+            renderAll();
+            showToast('Награда удалена', 'info');
+        }
+
+        // ==================== BACKUP EXPORT / IMPORT ====================
+
+        function exportBackup() {
+            const jsonStr = JSON.stringify(state);
+            const tempInput = document.createElement('textarea');
+            tempInput.value = jsonStr;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand('copy');
+                showToast('JSON-сейв скопирован в буфер обмена!', 'yellow');
+            } catch (err) {
+                showToast('Не удалось скопировать автоматически', 'crimson');
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        function openImportModal() {
+            showModal(`
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-display uppercase text-p5-yellow">ИМПОРТ СЕЙВА</h3>
+                        <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <p class="text-xs text-white/80">Вставь скопированный JSON-код сохранения:</p>
+                    <textarea id="import-json-area" rows="4" placeholder='{"version":"3.0-P5R","xp":...}' class="w-full p-2.5 bg-black border-2 border-white font-mono text-[11px] text-p5-yellow focus:outline-none"></textarea>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="closeModal()" class="p5-cutout-btn py-2.5 bg-p5-dark text-white text-xs font-display uppercase">ОТМЕНА</button>
+                        <button onclick="confirmImportBackup()" class="p5-cutout-btn py-2.5 bg-p5-red text-white text-xs font-display uppercase">ЗАГРУЗИТЬ</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function confirmImportBackup() {
+            const raw = document.getElementById('import-json-area').value.trim();
+            if (!raw) return;
+            try {
+                const parsed = JSON.parse(raw);
+                if (typeof parsed.pts !== 'number') {
+                    throw new Error('Invalid schema');
+                }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+                state = loadState();
+                closeModal();
+                renderAll();
+                showToast('Сейв успешно загружен!', 'yellow');
+            } catch (e) {
+                showToast('Ошибка: неверный JSON-код', 'crimson');
+            }
+        }
+
+        function openHardResetModal() {
+            showModal(`
+                <div class="p5-card-inner space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-display uppercase text-p5-red">ПОЛНЫЙ СБРОС ПРОГРЕССА?</h3>
+                        <button onclick="closeModal()" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <p class="text-xs text-white/80">Обнулит уровень, баланс PTS, стрик и вернёт стартовый список миссий. Отменить нельзя.</p>
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <button onclick="closeModal()" class="p5-cutout-btn py-2.5 bg-p5-dark text-white text-xs font-display uppercase">ОТМЕНА</button>
+                        <button onclick="confirmHardReset()" class="p5-cutout-btn py-2.5 bg-p5-red text-white text-xs font-display uppercase">СБРОСИТЬ ВСЁ</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function confirmHardReset() {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(LEGACY_STORAGE_KEY);
+            state = getDefaultState();
+            saveState();
+            closeModal();
+            renderAll();
+            showToast('Система сброшена до чистой P5R', 'info');
+        }
+
+        // ==================== NAVIGATION & UI HELPERS ====================
+
+        function switchMainTab(tab) {
+            activeMainTab = tab;
+            const tabs = ['quests', 'media', 'shop', 'stats'];
+            tabs.forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (t === tab) {
+                    sec.classList.remove('hidden');
+                    nav.className = 'p5-cutout-btn flex flex-col items-center justify-center py-1.5 bg-p5-red text-white relative';
+                } else {
+                    sec.classList.add('hidden');
+                    nav.className = 'p5-cutout-btn flex flex-col items-center justify-center py-1.5 bg-p5-dark text-white/75 hover:text-white relative';
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function switchQuestSubTab(sub) {
+            activeQuestSubTab = sub;
+            const subs = ['daily', 'weekly', 'story'];
+            subs.forEach(s => {
+                const btn = document.getElementById(`qtab-${s}`);
+                if (s === sub) {
+                    btn.className = 'p5-cutout-btn py-1.5 px-2 text-xs font-display uppercase bg-p5-red text-white';
+                } else {
+                    btn.className = 'p5-cutout-btn py-1.5 px-2 text-xs font-display uppercase bg-p5-dark text-white/70 hover:text-white';
+                }
+            });
+            renderSpecialWidgets();
+            renderQuests();
+        }
+
+        function filterDailyCategory(cat) {
+            activeDailyCategory = cat;
+            const cats = ['all', 'ege', 'clean', 'steps', 'tech', 'glowup'];
+            cats.forEach(c => {
+                const btn = document.getElementById(`dcat-${c}`);
+                if (!btn) return;
+                if (c === cat) {
+                    btn.className = 'p5-cutout-btn px-3 py-1.5 text-xs font-display uppercase whitespace-nowrap bg-p5-red text-white';
+                } else {
+                    btn.className = 'p5-cutout-btn px-3 py-1.5 text-xs font-display uppercase whitespace-nowrap bg-p5-dark text-white/80 hover:text-white';
+                }
+            });
+            renderQuests();
+        }
+
+        function switchShopSubTab(sub) {
+            activeShopSubTab = sub;
+            const btnStore = document.getElementById('stab-store');
+            const btnInv = document.getElementById('stab-inventory');
+            const viewStore = document.getElementById('shop-store-view');
+            const viewInv = document.getElementById('shop-inventory-view');
+
+            if (sub === 'store') {
+                btnStore.className = 'p5-cutout-btn py-1.5 px-3 text-xs font-display uppercase bg-p5-red text-white';
+                btnInv.className = 'p5-cutout-btn py-1.5 px-3 text-xs font-display uppercase bg-p5-dark text-white/75 relative';
+                viewStore.classList.remove('hidden');
+                viewInv.classList.add('hidden');
+            } else {
+                btnInv.className = 'p5-cutout-btn py-1.5 px-3 text-xs font-display uppercase bg-p5-red text-white relative';
+                btnStore.className = 'p5-cutout-btn py-1.5 px-3 text-xs font-display uppercase bg-p5-dark text-white/75';
+                viewInv.classList.remove('hidden');
+                viewStore.classList.add('hidden');
+            }
+        }
+
+        function filterShopCategory(cat) {
+            activeShopCategory = cat;
+            const cats = ['all', 'boost', 'chill', 'epic'];
+            cats.forEach(c => {
+                const btn = document.getElementById(`scat-${c}`);
+                if (c === cat) {
+                    btn.className = 'p5-cutout-btn px-3 py-1 text-xs font-display uppercase whitespace-nowrap bg-p5-red text-white';
+                } else {
+                    btn.className = 'p5-cutout-btn px-3 py-1 text-xs font-display uppercase whitespace-nowrap bg-p5-dark text-white/80';
+                }
+            });
+            renderShop();
+        }
+
+        function showModal(html) {
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            content.innerHTML = html;
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        window.onload = function () {
+            renderAll();
+        };
+    </script>
+</body>
+</html>
